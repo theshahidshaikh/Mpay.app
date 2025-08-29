@@ -136,7 +136,6 @@ const SuperAdminDashboard: React.FC = () => {
             <p className="text-3xl font-bold text-gray-900">{totals?.total_households.toLocaleString() || 0}</p>
             <p className="text-gray-500">Total Households</p>
           </div>
-          {/* New Population Card */}
           <div className="card text-center">
             <Users className="h-8 w-8 mx-auto text-indigo-500 mb-2" />
             <p className="text-3xl font-bold text-gray-900">{totals?.total_population.toLocaleString() || 0}</p>
@@ -154,15 +153,8 @@ const SuperAdminDashboard: React.FC = () => {
           </div>
         </div>
 
-        {/* --- Bar Chart --- */}
-        {statsByState.length > 0 && (
-          <div className="card mb-8">
-            <Bar options={chartOptions} data={chartData} />
-          </div>
-        )}
-        
         {/* --- Table View --- */}
-        <div className="card">
+        <div className="card mb-8">
           <h2 className="text-xl font-semibold text-gray-900 mb-6 flex items-center">
             <Map className="h-6 w-6 mr-3 text-primary-600" />
             Statistics by State
@@ -200,6 +192,13 @@ const SuperAdminDashboard: React.FC = () => {
             </div>
           )}
         </div>
+        
+        {/* --- Bar Chart (Moved to the bottom) --- */}
+        {statsByState.length > 0 && (
+          <div className="card">
+            <Bar options={chartOptions} data={chartData} />
+          </div>
+        )}
       </div>
     </div>
   );

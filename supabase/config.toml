@@ -141,3 +141,25 @@ entrypoint = "./functions/update-mosque-profile/index.ts"
 # Specifies static files to be bundled with the function. Supports glob patterns.
 # For example, if you want to serve static HTML pages in your function:
 # static_files = [ "./functions/update-mosque-profile/*.html" ]
+
+[functions.get-signed-receipt-url]
+enabled = true
+verify_jwt = true
+import_map = "./functions/get-signed-receipt-url/deno.json"
+# Uncomment to specify a custom file path to the entrypoint.
+# Supported file extensions are: .ts, .js, .mjs, .jsx, .tsx
+entrypoint = "./functions/get-signed-receipt-url/index.ts"
+# Specifies static files to be bundled with the function. Supports glob patterns.
+# For example, if you want to serve static HTML pages in your function:
+# static_files = [ "./functions/get-signed-receipt-url/*.html" ]
+
+[functions.set-super-admin]
+enabled = true
+verify_jwt = true
+import_map = "./functions/set-super-admin/deno.json"
+# Uncomment to specify a custom file path to the entrypoint.
+# Supported file extensions are: .ts, .js, .mjs, .jsx, .tsx
+entrypoint = "./functions/set-super-admin/index.ts"
+# Specifies static files to be bundled with the function. Supports glob patterns.
+# For example, if you want to serve static HTML pages in your function:
+# static_files = [ "./functions/set-super-admin/*.html" ]

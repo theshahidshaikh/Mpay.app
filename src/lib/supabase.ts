@@ -10,9 +10,9 @@ if (!supabaseUrl || !supabaseAnonKey || supabaseUrl === 'https://demo.supabase.c
 }
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
-
+(window as any).supabase = supabase;
 export type Database = {
-  public: {
+  public: {       
     Tables: {
       profiles: {
         Row: {

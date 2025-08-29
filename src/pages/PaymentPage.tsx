@@ -22,8 +22,8 @@ interface Household {
   annual_amount: number;
   mosques: {
     name: string;
-    upi_id: string; // Assuming you have added this column to your 'mosques' table
-  } | null; // Allow mosques to be null
+    upi_id: string; 
+  } | null;
 }
 
 interface Payment {
@@ -56,18 +56,13 @@ const PaymentPage: React.FC = () => {
     if (!user) return;
     setLoading(true);
     try {
-      // Use a left join to prevent crashes if a household is not linked to a mosque.
       const { data: householdData, error: householdError } = await supabase
         .from('households')
-        .select(`
-          *,
-          mosques(name, upi_id) 
-        `)
+        .select(`*, mosques(name, upi_id)`)
         .eq('user_id', user.id)
         .single();
 
       if (householdError) throw householdError;
-      
       if (!householdData) {
         toast.error("Could not find household details.");
         setLoading(false);
@@ -75,7 +70,6 @@ const PaymentPage: React.FC = () => {
       }
       setHousehold(householdData);
 
-      // Fetch payments for the current year
       const { data: paymentsData, error: paymentsError } = await supabase
         .from('payments')
         .select('*')
@@ -96,14 +90,12 @@ const PaymentPage: React.FC = () => {
     fetchData();
   }, [fetchData]);
 
-  const getPaymentStatus = (month: number) => {
-    const payment = payments.find(p => p.month === month);
-    return payment?.status || 'unpaid';
+  const getPaymentForMonth = (month: number): Payment | null => {
+    return payments.find(p => p.month === month) || null;
   };
 
   const handleMonthSelect = (month: number) => {
-    const status = getPaymentStatus(month);
-    // Prevent selecting months that are already paid or pending
+    const status = getPaymentForMonth(month)?.status;
     if (status === 'paid' || status === 'pending_verification') return;
 
     setSelectedMonths(prev => 
@@ -125,62 +117,107 @@ const PaymentPage: React.FC = () => {
     }
   };
 
-  const submitForVerification = async () => {
-    if (!household || selectedMonths.length === 0 || !screenshotFile) {
-      toast.error("Please select at least one month and upload a screenshot.");
-      return;
-    }
+const submitForVerification = async () => {
+  if (!household || selectedMonths.length === 0 || !screenshotFile) {
+    toast.error("Please select at least one month and upload a screenshot.");
+    return;
+  }
 
-    setProcessing(true);
-    try {
-      const monthlyAmount = household.annual_amount / 12;
-      
-      // 1. Upload the screenshot to Supabase Storage
-      const fileName = `${user?.id}/${Date.now()}_${screenshotFile.name}`;
-      const { error: uploadError } = await supabase.storage
-        .from('payment_screenshot') // Ensure this bucket name is correct
-        .upload(fileName, screenshotFile);
+  setProcessing(true);
+  try {
+    // Step 1: Re-check selected months in DB
+    const { data: currentPayments, error: checkError } = await supabase
+      .from('payments')
+      .select('id, month, status')
+      .eq('household_id', household.id)
+      .eq('year', currentYear)
+      .in('month', selectedMonths);
 
-      if (uploadError) throw uploadError;
+    if (checkError) throw checkError;
 
-      // 2. Get the public URL of the uploaded file
-      const { data: { publicUrl } } = supabase.storage
-        .from('payment_screenshot')
-        .getPublicUrl(fileName);
+    const monthlyAmount = household.annual_amount / 12;
+    const totalAmount = selectedMonths.length * monthlyAmount;
 
-      // 3. Create a payment record for each selected month
-      const paymentPromises = selectedMonths.map(month => 
-        supabase.from('payments').insert({
+    // Step 2: Upload screenshot
+    const fileName = `${user?.id}/${Date.now()}_${screenshotFile.name}`;
+    const { error: uploadError } = await supabase.storage
+      .from('payment_screenshot')
+      .upload(fileName, screenshotFile);
+
+    if (uploadError) throw uploadError;
+
+    const { data: { publicUrl } } = supabase.storage
+      .from('payment_screenshot')
+      .getPublicUrl(fileName);
+
+    const paymentDate = new Date().toISOString();
+
+    // Step 3: Create a new payment_group
+    const { data: groupData, error: groupError } = await supabase
+      .from('payment_groups')
+      .insert({
+        household_id: household.id,
+        total_amount: totalAmount,
+        screenshot_url: publicUrl,
+        status: 'pending_verification',
+        paid_at: paymentDate,
+      })
+      .select()
+      .single();
+
+    if (groupError) throw groupError;
+    const groupId = groupData.id;
+
+    // Step 4: Insert/Update monthly payments linked to group
+    const dbOperations = selectedMonths.map(month => {
+      const existingPayment = currentPayments.find(p => p.month === month);
+
+      if (existingPayment && existingPayment.status === 'rejected') {
+        return supabase.from('payments').update({
+          status: 'pending_verification',
+          receipt_url: publicUrl,
+          payment_date: paymentDate,
+          payment_group_id: groupId,
+          rejection_reason: null,
+        }).eq('id', existingPayment.id);
+      } else if (!existingPayment) {
+        return supabase.from('payments').insert({
           household_id: household.id,
           amount: monthlyAmount,
-          payment_date: new Date().toISOString(),
+          payment_date: paymentDate,
           month,
           year: currentYear,
           payment_method: 'upi',
-          status: 'pending_verification', // Set status to pending
-          receipt_url: publicUrl, // Match the column name in your database schema
+          status: 'pending_verification',
+          receipt_url: publicUrl,
+          payment_group_id: groupId,
           created_by: user?.id,
-        })
-      );
-      
-      await Promise.all(paymentPromises);
+        });
+      }
+      return Promise.resolve({ error: null });
+    });
 
-      toast.success(`Payment submitted for verification!`);
-      
-      // Reset state after successful submission
-      setSelectedMonths([]);
-      setShowPaymentForm(false);
-      setScreenshotFile(null);
-      setPaymentStep(1);
-      fetchData(); // Refresh data to show pending status
-
-    } catch (error) {
-      console.error('Error submitting for verification:', error);
-      toast.error('Submission failed. Please try again.');
-    } finally {
-      setProcessing(false);
+    const results = await Promise.all(dbOperations);
+    for (const result of results) {
+      if (result && result.error) throw result.error;
     }
-  };
+
+    toast.success("Payment submitted for verification!");
+
+    // Step 5: Reset form + reload
+    setSelectedMonths([]);
+    setShowPaymentForm(false);
+    setScreenshotFile(null);
+    setPaymentStep(1);
+    fetchData();
+
+  } catch (error: any) {
+    console.error("Error submitting payment group:", error);
+    toast.error(error.message || "Submission failed. Please try again.");
+  } finally {
+    setProcessing(false);
+  }
+};
 
   if (loading) {
     return (
@@ -200,7 +237,7 @@ const PaymentPage: React.FC = () => {
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-20">
             <div className="card text-center py-16">
                 <h2 className="text-xl font-semibold text-gray-800">Could Not Load Household Data</h2>
-                <p className="text-gray-600 mt-2">Please check your connection or contact your mosque admin.</p>
+                <p className="text-gray-600 mt-2">Please contact your mosque admin.</p>
             </div>
         </div>
       </div>
@@ -256,10 +293,11 @@ const PaymentPage: React.FC = () => {
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-6">
             {months.map((month, index) => {
               const monthNumber = index + 1;
-              const status = getPaymentStatus(monthNumber);
+              const status = getPaymentForMonth(monthNumber)?.status || 'unpaid';
               const isSelected = selectedMonths.includes(monthNumber);
               const isPaid = status === 'paid';
               const isPending = status === 'pending_verification';
+              const isRejected = status === 'rejected';
               
               return (
                 <button
@@ -269,6 +307,7 @@ const PaymentPage: React.FC = () => {
                   className={`p-4 rounded-lg border-2 transition-all duration-200 text-left ${
                     isPaid ? 'border-green-200 bg-green-50 cursor-not-allowed'
                     : isPending ? 'border-yellow-300 bg-yellow-50 cursor-not-allowed'
+                    : isRejected ? 'border-red-300 bg-red-50 hover:bg-red-100'
                     : isSelected ? 'border-primary-500 bg-primary-50'
                     : 'border-gray-200 bg-white hover:border-gray-300'
                   }`}
@@ -277,6 +316,7 @@ const PaymentPage: React.FC = () => {
                     <span className="text-sm font-medium text-gray-900">{month}</span>
                     {isPaid ? <CheckCircle className="h-5 w-5 text-green-600" />
                     : isPending ? <AlertCircle className="h-5 w-5 text-yellow-600" />
+                    : isRejected ? <XCircle className="h-5 w-5 text-red-600" />
                     : isSelected ? <CheckCircle className="h-5 w-5 text-primary-600" />
                     : <div className="h-5 w-5 rounded-full border-2 border-gray-300"></div>}
                   </div>
@@ -284,10 +324,11 @@ const PaymentPage: React.FC = () => {
                   <div className={`text-xs font-medium px-2 py-1 rounded-full inline-block ${
                     isPaid ? 'bg-green-100 text-green-800'
                     : isPending ? 'bg-yellow-100 text-yellow-800'
+                    : isRejected ? 'bg-red-100 text-red-800'
                     : isSelected ? 'bg-primary-100 text-primary-800'
                     : 'bg-gray-100 text-gray-800'
                   }`}>
-                    {isPaid ? 'Paid' : isPending ? 'Pending' : isSelected ? 'Selected' : 'Unpaid'}
+                    {isPaid ? 'Paid' : isPending ? 'Pending' : isRejected ? 'Rejected' : isSelected ? 'Selected' : 'Unpaid'}
                   </div>
                 </button>
               );

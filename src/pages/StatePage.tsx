@@ -156,16 +156,9 @@ const StatePage: React.FC = () => {
             <p className="text-gray-500">Collection (This Year)</p>
           </div>
         </div>
-
-        {/* --- Bar Chart --- */}
-        {statsByCity.length > 0 && (
-          <div className="card mb-8">
-            <Bar options={chartOptions} data={chartData} />
-          </div>
-        )}
-
+        
         {/* --- Table View of Cities --- */}
-        <div className="card">
+        <div className="card mb-8">
           <h2 className="text-xl font-semibold text-gray-900 mb-6 flex items-center">
             <MapPin className="h-6 w-6 mr-3 text-primary-600" />
             Statistics by City
@@ -203,6 +196,13 @@ const StatePage: React.FC = () => {
             </div>
           )}
         </div>
+
+        {/* --- Bar Chart (Moved to the bottom) --- */}
+        {statsByCity.length > 0 && (
+          <div className="card">
+            <Bar options={chartOptions} data={chartData} />
+          </div>
+        )}
       </div>
     </div>
   );
