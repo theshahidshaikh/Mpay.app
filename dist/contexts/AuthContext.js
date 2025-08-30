@@ -20,6 +20,11 @@ export const AuthProvider = ({ children }) => {
         supabase.auth.getSession().then(({ data: { session } }) => {
             console.log("2. Initial session fetched.", session);
             setSession(session);
+            if (session) {
+                console.log("--- DEBUG: COPY THIS TOKEN ---");
+                console.log(session.access_token);
+                console.log("--- END DEBUG ---");
+            }
             if (session?.user) {
                 console.log("3. Initial user found. Fetching profile...");
                 fetchUserProfile(session.user.id);

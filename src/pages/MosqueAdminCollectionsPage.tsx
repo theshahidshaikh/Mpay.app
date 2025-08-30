@@ -15,7 +15,7 @@ interface PaymentGroup {
   total_amount: number;
   months: string[];
   payment_method: string;
-  status: 'paid' | 'pending_verification' | 'rejected';
+  status: 'paid' | 'pending' | 'rejected';
 }
 
 interface PendingPaymentGroup {

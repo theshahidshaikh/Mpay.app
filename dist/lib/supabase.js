@@ -7,3 +7,4 @@ if (!supabaseUrl || !supabaseAnonKey || supabaseUrl === 'https://demo.supabase.c
     console.warn('⚠️ Using demo Supabase credentials. Please connect to Supabase for full functionality.');
 }
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+window.supabase = supabase;
