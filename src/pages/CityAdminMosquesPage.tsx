@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
-import { Building, Users, DollarSign, Eye, CheckCircle } from 'lucide-react';
+import { Building, Users, IndianRupee, Eye, CheckCircle } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 // Interfaces for both active and pending mosques
@@ -144,7 +144,7 @@ const CityAdminMosquesPage: React.FC = () => {
                         <Users className="h-4 w-4 text-gray-400 mr-2" /> {mosque.households_count} Households
                       </div>
                       <div className="text-sm text-gray-900 flex items-center mt-1">
-                        <DollarSign className="h-4 w-4 text-green-400 mr-2" /> ₹{mosque.total_collected.toLocaleString()} Collected
+                        <IndianRupee className="h-4 w-4 text-green-400 mr-2" /> ₹{mosque.total_collected.toLocaleString()} Collected
                       </div>
                     </td>
                     <td className="px-11 py-4 whitespace-nowrap text-sm font-medium">

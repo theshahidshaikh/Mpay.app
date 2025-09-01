@@ -351,7 +351,7 @@ const MonthCard: React.FC<{ month: string, status: string, reason?: string | nul
       text: 'Paid',
       textColor: 'text-green-700'
     },
-    pending_verification: {
+    pending: {
       icon: <AlertCircle className="h-5 w-5 text-yellow-600" />,
       style: 'border-yellow-300 bg-yellow-100',
       text: 'Pending',
@@ -365,7 +365,7 @@ const MonthCard: React.FC<{ month: string, status: string, reason?: string | nul
     },
     unpaid: {
       icon: <HelpCircle className="h-5 w-5 text-red-600" />,
-      style: 'border-red-300 bg-red-100',
+      style: 'border-red-300 bg-grey-100',
       text: 'Unpaid',
       textColor: 'text-red-700'
     }

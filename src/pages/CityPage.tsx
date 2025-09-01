@@ -66,20 +66,6 @@ const CityPage: React.FC = () => {
     }
   }, [user, fetchData]);
 
-  const handleApproveMosque = async (mosqueId: string) => {
-    const toastId = toast.loading('Approving mosque...');
-    try {
-      const { error } = await supabase.functions.invoke('approve-request', {
-        body: { requestId: mosqueId, requestType: 'mosque' },
-      });
-      if (error) throw new Error(error.message);
-      toast.success('Mosque approved successfully!', { id: toastId });
-      fetchData(); // Refresh all data
-    } catch (error: any) {
-      toast.error(error.message || 'Failed to approve mosque.', { id: toastId });
-    }
-  };
-
   const handleMosqueClick = (mosqueId: string) => {
     navigate(`/mosques/${mosqueId}`);
   };
@@ -132,26 +118,6 @@ const CityPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Pending Approvals Section */}
-        {pendingMosques.length > 0 && (
-          <div className="card mb-8">
-            <h2 className="text-xl font-semibold text-gray-900 mb-6">Pending Mosque Approvals</h2>
-            <div className="space-y-4">
-              {pendingMosques.map((mosque) => (
-                <div key={mosque.id} className="flex items-center justify-between p-4 border rounded-lg bg-amber-50">
-                  <div>
-                    <p className="font-semibold text-gray-800">{mosque.name}</p>
-                    <p className="text-sm text-gray-600">Admin: {mosque.admin?.full_name} ({mosque.admin?.email})</p>
-                  </div>
-                  <button onClick={() => handleApproveMosque(mosque.id)} className="btn-primary">
-                    <CheckCircle className="h-5 w-5 mr-2" />
-                    Approve
-                  </button>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
 
         {/* Active Mosques Table */}
         <div className="card">

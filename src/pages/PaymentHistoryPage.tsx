@@ -316,7 +316,7 @@ const PaymentHistoryPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Payment History Table */}
+        {/* Payment History Display */}
         <div className="card">
           <h2 className="text-xl font-semibold text-gray-900 mb-6">Transaction History</h2>
           
@@ -337,73 +337,81 @@ const PaymentHistoryPage: React.FC = () => {
               </button>
             </div>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Date
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Month/Year
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Amount
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Method
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Transaction ID
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Status
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                  {filteredPayments.map((payment) => (
-                    <tr key={payment.id} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex items-center">
-                          <Calendar className="h-4 w-4 text-gray-400 mr-2" />
-                          <div>
-                            <div className="text-sm font-medium text-gray-900">
-                              {format(new Date(payment.payment_date), 'MMM dd, yyyy')}
-                            </div>
-                            <div className="text-sm text-gray-500">
-                              {format(new Date(payment.payment_date), 'HH:mm')}
+            <div>
+              {/* --- 👇 NEW: Mobile Card View --- */}
+              <div className="space-y-4 md:hidden">
+                {filteredPayments.map((payment) => (
+                  <div key={payment.id} className="bg-gray-50 p-4 rounded-lg border">
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <p className="font-bold text-gray-900 text-lg">₹{payment.amount.toLocaleString()}</p>
+                        <p className="text-sm font-medium text-gray-700">{months[payment.month - 1]} {payment.year}</p>
+                      </div>
+                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getPaymentMethodColor(payment.payment_method)}`}>
+                        {getPaymentMethodIcon(payment.payment_method)}
+                        <span className="ml-1">{payment.payment_method.toUpperCase()}</span>
+                      </span>
+                    </div>
+                    <div className="mt-4 pt-4 border-t border-gray-200 text-xs text-gray-600 space-y-2">
+                      <div className="flex justify-between">
+                        <span className="font-medium">Date:</span>
+                        <span>{format(new Date(payment.payment_date), 'MMM dd, yyyy - HH:mm')}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="font-medium">Transaction ID:</span>
+                        <span className="font-mono break-all">{payment.transaction_id || 'N/A'}</span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="font-medium">Status:</span>
+                        <span className="status-paid"><CheckCircle className="h-3 w-3 mr-1 inline" />Paid</span>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* --- Existing Desktop Table View --- */}
+              <div className="overflow-x-auto hidden md:block">
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Month/Year</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Method</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Transaction ID</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {filteredPayments.map((payment) => (
+                      <tr key={payment.id} className="hover:bg-gray-50">
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="flex items-center">
+                            <Calendar className="h-4 w-4 text-gray-400 mr-2" />
+                            <div>
+                              <div className="text-sm font-medium text-gray-900">{format(new Date(payment.payment_date), 'MMM dd, yyyy')}</div>
+                              <div className="text-sm text-gray-500">{format(new Date(payment.payment_date), 'HH:mm')}</div>
                             </div>
                           </div>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {months[payment.month - 1]} {payment.year}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm font-semibold text-gray-900">
-                          ₹{payment.amount.toLocaleString()}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getPaymentMethodColor(payment.payment_method)}`}>
-                          {getPaymentMethodIcon(payment.payment_method)}
-                          <span className="ml-1">{payment.payment_method.toUpperCase()}</span>
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-mono">
-                        {payment.transaction_id || 'N/A'}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span className="status-paid">
-                          <CheckCircle className="h-3 w-3 mr-1 inline" />
-                          Paid
-                        </span>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{months[payment.month - 1]} {payment.year}</td>
+                        <td className="px-6 py-4 whitespace-nowrap"><div className="text-sm font-semibold text-gray-900">₹{payment.amount.toLocaleString()}</div></td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getPaymentMethodColor(payment.payment_method)}`}>
+                            {getPaymentMethodIcon(payment.payment_method)}
+                            <span className="ml-1">{payment.payment_method.toUpperCase()}</span>
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-mono">{payment.transaction_id || 'N/A'}</td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <span className="status-paid"><CheckCircle className="h-3 w-3 mr-1 inline" />Paid</span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
           )}
         </div>

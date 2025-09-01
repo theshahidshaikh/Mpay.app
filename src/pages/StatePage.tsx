@@ -38,7 +38,7 @@ interface CityStat {
   city: string;
   mosque_count: number;
   household_count: number;
-  population_count: number;
+  population: number;
 }
 
 const StatePage: React.FC = () => {
@@ -168,9 +168,9 @@ const StatePage: React.FC = () => {
               <thead className="bg-gray-50">
                 <tr>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">City</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Mosques</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Households</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Population</th>
+                  <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Mosques</th>
+                  <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Households</th>
+                  <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Population</th>
                   <th className="relative px-6 py-3"><span className="sr-only">View</span></th>
                 </tr>
               </thead>
@@ -178,9 +178,9 @@ const StatePage: React.FC = () => {
                 {statsByCity.map((stat) => (
                   <tr key={stat.city} onClick={() => handleCityClick(stat.city)} className="hover:bg-gray-50 cursor-pointer">
                     <td className="px-6 py-4 whitespace-nowrap font-medium text-gray-900">{stat.city}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-gray-600">{stat.mosque_count}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-gray-600">{stat.household_count}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-gray-600">{stat.population_count}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-gray-600 text-center">{stat.mosque_count}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-gray-600 text-center">{stat.household_count}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-gray-600 text-center">{stat.population}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                       <ChevronRight className="h-5 w-5 text-gray-400" />
                     </td>

@@ -48,13 +48,13 @@ const ProfilePage: React.FC = () => {
         .from('households')
         .select(`
           *,
-          mosques!inner(name, address)
+          mosque:mosques!inner(name, address)
         `)
         .eq('user_id', user.id)
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
-      
+
       setHousehold(data);
       setEditData({
         head_of_house: data.head_of_house,

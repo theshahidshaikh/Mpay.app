@@ -10,7 +10,7 @@ import {
   XCircle,
   AlertCircle,
   ArrowLeft,
-  Upload
+  Upload,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
@@ -69,6 +69,7 @@ const PaymentPage: React.FC = () => {
         return;
       }
       setHousehold(householdData);
+      console.log('Fetched household data:', householdData);
 
       const { data: paymentsData, error: paymentsError } = await supabase
         .from('payments')
@@ -118,6 +119,10 @@ const PaymentPage: React.FC = () => {
   };
 
 const submitForVerification = async () => {
+  console.log('--- RLS DEBUGGING ---');
+  console.log('Current User ID (auth.uid):', user?.id);
+  console.log('Household ID being paid for:', household?.id);
+  console.log('---------------------');
   if (!household || selectedMonths.length === 0 || !screenshotFile) {
     toast.error("Please select at least one month and upload a screenshot.");
     return;
@@ -132,6 +137,7 @@ const submitForVerification = async () => {
       .eq('household_id', household.id)
       .eq('year', currentYear)
       .in('month', selectedMonths);
+
 
     if (checkError) throw checkError;
 
@@ -159,8 +165,9 @@ const submitForVerification = async () => {
         household_id: household.id,
         total_amount: totalAmount,
         screenshot_url: publicUrl,
-        status: 'pending_verification',
+        status: 'pending',
         paid_at: paymentDate,
+        created_by: user?.id,
       })
       .select()
       .single();
@@ -174,7 +181,7 @@ const submitForVerification = async () => {
 
       if (existingPayment && existingPayment.status === 'rejected') {
         return supabase.from('payments').update({
-          status: 'pending_verification',
+          status: 'pending',
           receipt_url: publicUrl,
           payment_date: paymentDate,
           payment_group_id: groupId,
@@ -188,7 +195,7 @@ const submitForVerification = async () => {
           month,
           year: currentYear,
           payment_method: 'upi',
-          status: 'pending_verification',
+          status: 'pending',
           receipt_url: publicUrl,
           payment_group_id: groupId,
           created_by: user?.id,
@@ -278,7 +285,6 @@ const submitForVerification = async () => {
             <div>
               <p className="text-sm font-medium text-gray-600">Monthly Amount</p>
               <p className="text-lg font-semibold text-primary-600 flex items-center">
-                <DollarSign className="h-5 w-5 mr-1" />
                 ₹{(household.annual_amount / 12).toFixed(0)}
               </p>
             </div>
@@ -296,7 +302,7 @@ const submitForVerification = async () => {
               const status = getPaymentForMonth(monthNumber)?.status || 'unpaid';
               const isSelected = selectedMonths.includes(monthNumber);
               const isPaid = status === 'paid';
-              const isPending = status === 'pending_verification';
+              const isPending = status === 'pending';
               const isRejected = status === 'rejected';
               
               return (

@@ -10,15 +10,15 @@ interface AdminProfile {
   full_name: string;
   email: string;
   contact_number: string;
-  city: string;
-  state: string;
+  // city: string;
+  // state: string;
 }
 
 const SuperAdminProfilePage: React.FC = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const [profile, setProfile] = useState<AdminProfile>({ full_name: '', email: '', contact_number: '', city: '', state: '' });
-  const [originalProfile, setOriginalProfile] = useState<AdminProfile>({ full_name: '', email: '', contact_number: '', city: '', state: '' });
+  const [profile, setProfile] = useState<AdminProfile>({ full_name: '', email: '', contact_number: '' });
+  const [originalProfile, setOriginalProfile] = useState<AdminProfile>({ full_name: '', email: '', contact_number: '' });
   const [loading, setLoading] = useState(true);
   const [isUpdating, setIsUpdating] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
@@ -63,8 +63,8 @@ const SuperAdminProfilePage: React.FC = () => {
         .update({
           full_name: profile.full_name,
           contact_number: profile.contact_number,
-          city: profile.city,
-          state: profile.state,
+          // city: profile.city,
+          // state: profile.state,
         })
         .eq('id', user.id);
       if (error) throw error;
@@ -100,29 +100,50 @@ const SuperAdminProfilePage: React.FC = () => {
     }
   };
 
+  // --- UPDATED: Logic to verify current password before changing ---
   const handlePasswordChangeSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    // Client-side validation
+    if (!currentPassword) {
+      return toast.error('Please enter your current password.');
+    }
     if (newPassword !== confirmNewPassword) {
       return toast.error('New passwords do not match.');
     }
     if (newPassword.length < 6) {
       return toast.error('Password must be at least 6 characters long.');
     }
-    
+
     setIsUpdating(true);
-    const toastId = toast.loading('Changing password...');
+    const toastId = toast.loading('Verifying and changing password...');
 
-    const { error } = await supabase.auth.updateUser({ password: newPassword });
+    try {
+      // Step 1: Verify the current password by trying to sign in with it.
+      const { error: signInError } = await supabase.auth.signInWithPassword({
+        email: profile.email,
+        password: currentPassword,
+      });
 
-    setIsUpdating(false);
-    if (error) {
-      toast.error(error.message || 'Failed to change password.', { id: toastId });
-    } else {
+      if (signInError) {
+        throw new Error('Incorrect current password. Please try again.');
+      }
+
+      // Step 2: If verification is successful, update to the new password.
+      const { error: updateError } = await supabase.auth.updateUser({
+        password: newPassword,
+      });
+
+      if (updateError) throw updateError;
+
       toast.success('Password changed successfully!', { id: toastId });
       setShowPasswordModal(false);
       setCurrentPassword('');
       setNewPassword('');
       setConfirmNewPassword('');
+    } catch (error: any) {
+      toast.error(error.message || 'Failed to change password.', { id: toastId });
+    } finally {
+      setIsUpdating(false);
     }
   };
 
@@ -166,36 +187,49 @@ const SuperAdminProfilePage: React.FC = () => {
           </div>
         </div>
 
-        {/* --- Profile Information Card --- */}
+      {/* --- REDESIGNED Profile Information Card --- */}
         <div className="bg-white p-6 rounded-lg shadow-md mb-8">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-xl font-semibold text-gray-900">Personal Information</h2>
-            {!isEditing && (
-              <button onClick={() => setIsEditing(true)} className="btn-secondary">
-                <Edit className="h-4 w-4 mr-2" />
-                Edit Profile
-              </button>
-            )}
-          </div>
-          <form onSubmit={handleUpdateProfile} className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700">Full Name</label>
-              <input type="text" value={profile.full_name} onChange={(e) => setProfile({ ...profile, full_name: e.target.value })} readOnly={!isEditing} className={`input-field mt-1 ${!isEditing ? 'bg-gray-100 cursor-not-allowed' : ''}`}/>
+          <form onSubmit={handleUpdateProfile}>
+            <div className="flex justify-between items-center mb-6 border-b pb-4">
+              <h2 className="text-xl font-semibold text-gray-900">Personal Information</h2>
+              {!isEditing && (
+                <button type="button" onClick={() => setIsEditing(true)} className="btn-secondary">
+                  <Edit className="h-4 w-4 mr-2" />
+                  Edit Profile
+                </button>
+              )}
             </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700">Contact Number</label>
-              <input type="text" value={profile.contact_number || ''} onChange={(e) => setProfile({ ...profile, contact_number: e.target.value })} readOnly={!isEditing} className={`input-field mt-1 ${!isEditing ? 'bg-gray-100 cursor-not-allowed' : ''}`}/>
+
+            <div className="space-y-6">
+              {/* Full Name Field */}
+              <div className="grid grid-cols-3 items-center">
+                <label className="block text-sm font-medium text-gray-700">Full Name</label>
+                <div className="col-span-2">
+                  {isEditing ? (
+                    <input type="text" value={profile.full_name} onChange={(e) => setProfile({ ...profile, full_name: e.target.value })} className="input-field"/>
+                  ) : (
+                    <p className="text-gray-800">{profile.full_name}</p>
+                  )}
+                </div>
+              </div>
+
+              {/* Contact Number Field */}
+              <div className="grid grid-cols-3 items-center">
+                <label className="block text-sm font-medium text-gray-700">Contact Number</label>
+                <div className="col-span-2">
+                  {isEditing ? (
+                    <input type="text" value={profile.contact_number || ''} onChange={(e) => setProfile({ ...profile, contact_number: e.target.value })} className="input-field"/>
+                  ) : (
+                    <p className="text-gray-800">{profile.contact_number || 'N/A'}</p>
+                  )}
+                </div>
+              </div>
+
+              {/* REMOVED State and City fields */}
             </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700">State</label>
-              <input type="text" value={profile.state || ''} onChange={(e) => setProfile({ ...profile, state: e.target.value })} readOnly={!isEditing} className={`input-field mt-1 ${!isEditing ? 'bg-gray-100 cursor-not-allowed' : ''}`}/>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700">City</label>
-              <input type="text" value={profile.city || ''} onChange={(e) => setProfile({ ...profile, city: e.target.value })} readOnly={!isEditing} className={`input-field mt-1 ${!isEditing ? 'bg-gray-100 cursor-not-allowed' : ''}`}/>
-            </div>
+
             {isEditing && (
-              <div className="pt-2 flex justify-end space-x-3">
+              <div className="pt-6 mt-6 border-t flex justify-end space-x-3">
                 <button type="button" onClick={handleCancelEdit} className="btn-secondary">
                   <X className="h-5 w-5 mr-2" /> Cancel
                 </button>
@@ -206,7 +240,7 @@ const SuperAdminProfilePage: React.FC = () => {
             )}
           </form>
         </div>
-
+        
         {/* --- Security Card --- */}
         <div className="bg-white p-6 rounded-lg shadow-md">
           <h2 className="text-xl font-semibold text-gray-900 mb-6">Account Security</h2>
@@ -234,31 +268,45 @@ const SuperAdminProfilePage: React.FC = () => {
         </div>
       </main>
 
-      {/* Change Password Modal */}
+{/* --- UPDATED: Change Password Modal --- */}
       {showPasswordModal && (
         <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-lg p-6 w-full max-w-md shadow-xl">
             <h3 className="text-lg font-medium text-gray-900 mb-4">Change Password</h3>
             <form onSubmit={handlePasswordChangeSubmit} className="space-y-4">
+              {/* NEW: Current Password Field */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Current Password</label>
+                <input
+                  type="password"
+                  value={currentPassword}
+                  onChange={(e) => setCurrentPassword(e.target.value)}
+                  className="input-field mt-1"
+                  required
+                />
+              </div>
+
               <div>
                 <label className="block text-sm font-medium text-gray-700">New Password</label>
                 <input type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} className="input-field mt-1" placeholder="At least 6 characters" required/>
               </div>
+
               <div>
                 <label className="block text-sm font-medium text-gray-700">Confirm New Password</label>
                 <input type="password" value={confirmNewPassword} onChange={(e) => setConfirmNewPassword(e.target.value)} className="input-field mt-1" required/>
               </div>
+
               <div className="pt-4 flex justify-between items-center">
                 <button type="button" onClick={handlePasswordReset} className="text-sm text-primary-600 hover:underline">
-                    Forgot Password?
+                  Forgot Password?
                 </button>
                 <div className="space-x-3">
-                    <button type="button" onClick={() => setShowPasswordModal(false)} className="btn-secondary">
-                        Cancel
-                    </button>
-                    <button type="submit" className="btn-primary" disabled={isUpdating}>
-                        {isUpdating ? 'Saving...' : 'Save'}
-                    </button>
+                  <button type="button" onClick={() => setShowPasswordModal(false)} className="btn-secondary">
+                    Cancel
+                  </button>
+                  <button type="submit" className="btn-primary" disabled={isUpdating}>
+                    {isUpdating ? 'Saving...' : 'Save'}
+                  </button>
                 </div>
               </div>
             </form>

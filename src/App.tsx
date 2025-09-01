@@ -29,6 +29,8 @@ import SuperAdminChangeRequestsPage from './pages/SuperAdminChangeRequestsPage';
 import MosqueAdminHouseholdsPage from './pages/MosqueAdminHouseholdsPage';
 import MosqueAdminCollectionsPage from './pages/MosqueAdminCollectionsPage';
 import MosqueAdminProfilePage from './pages/MosqueAdminProfilePage';
+import LandingPage from './pages/LandingPage';
+import MosqueAdminHouseholdDetailsPage from './pages/MosqueAdminHouseholdDetailsPage';
 
 
 
@@ -69,6 +71,7 @@ function AppRoutes() {
   
   return (
     <Routes>
+      <Route path="/" element={!user ? <LandingPage /> : <Navigate to="/dashboard" />} />
       <Route path="/login" element={!user ? <LoginPage /> : <Navigate to="/dashboard" />} />
       <Route path="/register" element={!user ? <RegisterPage /> : <Navigate to="/dashboard" />} />
        <Route path="/register/admin" element={<AdminRegistrationPage />} />
@@ -93,7 +96,8 @@ function AppRoutes() {
       {/* Mosque Admin Routes */}
       <Route path="/admin/dashboard" element={<ProtectedRoute roles={['mosque_admin']}><MosqueAdminDashboard /></ProtectedRoute>} />
       {/* NEW: Added missing Mosque Admin routes */}
-      <Route path="/admin/households" element={<ProtectedRoute roles={['mosque_admin']}><MosqueAdminHouseholdsPage /></ProtectedRoute>} />
+      <Route path="/admin/households/" element={<ProtectedRoute roles={['mosque_admin']}><MosqueAdminHouseholdsPage /></ProtectedRoute>} />
+      <Route path="/mosque/household/:householdId/" element={<ProtectedRoute roles={['mosque_admin']}><MosqueAdminHouseholdDetailsPage /></ProtectedRoute>} />
       <Route path="/admin/collections" element={<ProtectedRoute roles={['mosque_admin']}><MosqueAdminCollectionsPage /></ProtectedRoute>} />
       <Route path="/admin/profile" element={<ProtectedRoute roles={['mosque_admin']}><MosqueAdminProfilePage /></ProtectedRoute>} />
 
@@ -118,7 +122,7 @@ function AppRoutes() {
       {/* <Route path="/super/mosques/:mosqueId" element={<ProtectedRoute roles={['super_admin']}><MosqueDetailsPage /></ProtectedRoute>}/> */}
       <Route path='super/admins' element={<ProtectedRoute roles={['super_admin']}><CityAdminsPage/></ProtectedRoute>}/>
       <Route path="/" element={<Navigate to="/dashboard" />} />
-      <Route path="*" element={<Navigate to="/dashboard" />} />
+      <Route path="*" element={<Navigate to="/" />} />
 
       <Route 
         path="/mosques/:mosqueId" 
@@ -127,6 +131,7 @@ function AppRoutes() {
             <MosqueDetailsPage />
           </ProtectedRoute>
         } 
+
       />
     </Routes>
   );

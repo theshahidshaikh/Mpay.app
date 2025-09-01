@@ -4,7 +4,7 @@ import Navbar from '../components/Navbar';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
 import { 
-  Users, DollarSign, Search, Inbox, Phone, Calendar, TrendingUp, CheckCircle
+  Users, DollarSign, Search, Inbox, CheckCircle, TrendingUp
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -37,6 +37,9 @@ const MosqueAdminDashboard: React.FC = () => {
   const [startYear, setStartYear] = useState(new Date().getFullYear());
   const [endMonth, setEndMonth] = useState(new Date().getMonth() + 1);
   const [endYear, setEndYear] = useState(new Date().getFullYear());
+  
+  // --- NEW: State for the payment status filter ---
+  const [paymentStatusFilter, setPaymentStatusFilter] = useState('all');
 
   const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
   const years = [new Date().getFullYear() - 1, new Date().getFullYear(), new Date().getFullYear() + 1];
@@ -45,7 +48,6 @@ const MosqueAdminDashboard: React.FC = () => {
     if (!user) return;
     setLoading(true);
     try {
-      // Fetch both sets of data in parallel for efficiency
       const [reportData, summaryData] = await Promise.all([
         supabase.rpc('get_mosque_reporting_data', {
             admin_user_id: user.id, 
@@ -82,10 +84,24 @@ const MosqueAdminDashboard: React.FC = () => {
     }
   }, [user, fetchData]);
 
-  const filteredHouseholds = households.filter(h =>
-    h.head_of_house.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (h.contact_number && h.contact_number.includes(searchTerm))
-  );
+  // --- UPDATED: Filtering logic now includes payment status ---
+  const filteredHouseholds = households
+    .filter(h => {
+        if (paymentStatusFilter === 'all') {
+            return true;
+        }
+        if (paymentStatusFilter === 'fully_paid') {
+            return h.unpaid_months === 0;
+        }
+        if (paymentStatusFilter === 'partially_unpaid') {
+            return h.unpaid_months > 0;
+        }
+        return true;
+    })
+    .filter(h =>
+        h.head_of_house.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (h.contact_number && h.contact_number.includes(searchTerm))
+    );
 
   if (loading) {
     return (
@@ -118,9 +134,9 @@ const MosqueAdminDashboard: React.FC = () => {
             </div>
         )}
 
-        {/* Filter Controls Section */}
+        {/* --- UPDATED: Filter Controls Section --- */}
         <div className="bg-white p-6 rounded-lg shadow-md mb-8">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-end">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6 items-end">
                 <div className="md:col-span-2">
                     <label className="block text-sm font-medium text-gray-700 mb-1">Select Date Range</label>
                     <div className="flex items-center gap-4">
@@ -148,9 +164,22 @@ const MosqueAdminDashboard: React.FC = () => {
                         </div>
                     </div>
                 </div>
+                {/* NEW: Payment Status Filter */}
+                <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Payment Status</label>
+                    <select
+                        value={paymentStatusFilter}
+                        onChange={(e) => setPaymentStatusFilter(e.target.value)}
+                        className="input-field w-full"
+                    >
+                        <option value="all">All</option>
+                        <option value="fully_paid">Fully Paid</option>
+                        <option value="partially_unpaid">Partially/Unpaid</option>
+                    </select>
+                </div>
                 <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Search by Name or Contact</label>
-                     <div className="relative">
+                    <div className="relative">
                         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"><Search className="h-5 w-5 text-gray-400" /></div>
                         <input type="text" placeholder="Search..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="input-field pl-10" />
                     </div>

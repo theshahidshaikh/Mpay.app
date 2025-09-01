@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
-import { MapPin, ArrowLeft, Users, DollarSign, TrendingUp, User, Phone, Trash2, AlertTriangle } from 'lucide-react';
+import { MapPin, ArrowLeft, Users, IndianRupee, TrendingUp, User, Phone, Trash2, AlertTriangle } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 // Interfaces to match the function's response
@@ -147,7 +147,7 @@ const MosqueDetailsPage: React.FC = () => {
             <h2 className="text-xl font-semibold text-gray-900 mb-4">Financial Overview ({selectedYear})</h2>
             <div className="space-y-4">
               <div className="flex justify-between items-center"><span className="text-gray-600 flex items-center"><TrendingUp className="mr-2 h-5 w-5"/>Expected Collection</span> <span className="font-bold text-lg">₹{stats.expected_collection.toLocaleString()}</span></div>
-              <div className="flex justify-between items-center"><span className="text-gray-600 flex items-center"><DollarSign className="mr-2 h-5 w-5 text-green-500"/>Total Collected</span> <span className="font-bold text-lg text-green-600">₹{stats.total_collected.toLocaleString()}</span></div>
+              <div className="flex justify-between items-center"><span className="text-gray-600 flex items-center"><IndianRupee className="mr-2 h-5 w-5 text-green-500"/>Total Collected</span> <span className="font-bold text-lg text-green-600">₹{stats.total_collected.toLocaleString()}</span></div>
             </div>
           </div>
           

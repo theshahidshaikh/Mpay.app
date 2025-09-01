@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import Navbar from '../components/Navbar';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
-import { User, Save, Edit, X, LogOut, KeyRound, Building } from 'lucide-react';
+import { User, Save, Edit, X, LogOut, KeyRound, Building, Wallet } from 'lucide-react'; // 👈 Added Wallet icon
 import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 
@@ -10,7 +10,10 @@ interface Profile {
   full_name: string; email: string; contact_number: string; city: string; state: string;
 }
 interface Mosque {
-  name: string; address: string; annual_amount: number;
+  name: string; 
+  address: string; 
+  annual_amount: number;
+  upi_id: string; // 👈 Add upi_id to the interface
 }
 
 const MosqueAdminProfilePage: React.FC = () => {
@@ -54,6 +57,8 @@ const MosqueAdminProfilePage: React.FC = () => {
     setIsUpdating(true);
     const toastId = toast.loading('Updating profile...');
     try {
+      // The existing edge function should handle the new 'upi_id' field automatically 
+      // as long as it's passed in the 'mosqueUpdates' object.
       const { error } = await supabase.functions.invoke('update-mosque-profile', {
         body: { userId: user.id, profileUpdates: profile, mosqueUpdates: mosque },
       });
@@ -152,6 +157,21 @@ const MosqueAdminProfilePage: React.FC = () => {
                         <div><label className="label">Mosque Name</label><input type="text" value={mosque.name} onChange={(e) => setMosque({...mosque, name: e.target.value})} readOnly={!isEditing} className={`input-field ${!isEditing ? 'bg-gray-100' : ''}`}/></div>
                         <div><label className="label">Default Annual Amount</label><input type="number" value={mosque.annual_amount} onChange={(e) => setMosque({...mosque, annual_amount: parseInt(e.target.value)})} readOnly={!isEditing} className={`input-field ${!isEditing ? 'bg-gray-100' : ''}`}/></div>
                         <div className="md:col-span-2"><label className="label">Mosque Address</label><input type="text" value={mosque.address} onChange={(e) => setMosque({...mosque, address: e.target.value})} readOnly={!isEditing} className={`input-field ${!isEditing ? 'bg-gray-100' : ''}`}/></div>
+                        
+                        {/* --- 👇 NEW UPI ID FIELD --- */}
+                        <div className="md:col-span-2">
+                            <label className="label flex items-center"><Wallet className="h-4 w-4 mr-2 text-gray-500" /> UPI ID for Collections</label>
+                            <input 
+                                type="text" 
+                                value={mosque.upi_id || ''} 
+                                onChange={(e) => setMosque({...mosque, upi_id: e.target.value})} 
+                                readOnly={!isEditing} 
+                                className={`input-field ${!isEditing ? 'bg-gray-100' : ''}`}
+                                placeholder={!isEditing ? 'Not set' : 'e.g., mosque-name@upi'}
+                            />
+                        </div>
+                        {/* --- END of new field --- */}
+
                         <div><label className="label">City</label><input type="text" value={profile.city || ''} readOnly className="input-field bg-gray-100 cursor-not-allowed"/></div>
                         <div><label className="label">State</label><input type="text" value={profile.state || ''} readOnly className="input-field bg-gray-100 cursor-not-allowed"/></div>
                     </div>

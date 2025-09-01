@@ -1,46 +1,57 @@
-// supabase/functions/update-mosque-profile/index.ts
-
-import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 import { corsHeaders } from '../../_shared/cors.ts'
 
-serve(async (req) => {
+Deno.serve(async (req) => {
+  // Handle preflight OPTIONS request
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders })
   }
 
   try {
-    const { userId, profileUpdates, mosqueUpdates } = await req.json()
+    // Create a Supabase client to securely get the logged-in user from their token
+    const supabase = createClient(
+      Deno.env.get('SUPABASE_URL')!,
+      Deno.env.get('SUPABASE_ANON_KEY')!,
+      { global: { headers: { Authorization: req.headers.get('Authorization')! } } }
+    )
 
-    if (!userId || !profileUpdates || !mosqueUpdates) {
-      throw new Error('User ID, profile, and mosque updates are required.');
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) {
+      throw new Error('Authentication error: User not found')
     }
 
+    const { profileUpdates, mosqueUpdates } = await req.json()
+    if (!profileUpdates || !mosqueUpdates) {
+      throw new Error('Profile and mosque update data are required.');
+    }
+    
+    // Create a Supabase admin client to perform the updates
     const supabaseAdmin = createClient(
       Deno.env.get('SUPABASE_URL')!,
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
-    );
+    )
 
-    // 1. Update the user's personal details in the 'profiles' table
+    // 1. Update the user's personal details in the correct 'admin_profiles' table
     const { error: profileError } = await supabaseAdmin
-      .from('profiles')
+      .from('admin_profiles')
       .update({
         full_name: profileUpdates.full_name,
-        phone: profileUpdates.contact_number,
+        contact_number: profileUpdates.contact_number,
       })
-      .eq('id', userId);
+      .eq('id', user.id); // Security: Use the authenticated user's ID
 
     if (profileError) throw profileError;
 
-    // 2. Update the mosque's details in the 'mosques' table
+    // 2. Update the mosque's details, including the new upi_id
     const { error: mosqueError } = await supabaseAdmin
       .from('mosques')
       .update({
         name: mosqueUpdates.name,
         address: mosqueUpdates.address,
         annual_amount: mosqueUpdates.annual_amount,
+        upi_id: mosqueUpdates.upi_id, // Ensure UPI ID is included
       })
-      .eq('admin_id', userId);
+      .eq('admin_id', user.id); // Security: Only update the mosque this user administers
 
     if (mosqueError) throw mosqueError;
 
@@ -55,3 +66,4 @@ serve(async (req) => {
     });
   }
 });
+

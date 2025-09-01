@@ -1,7 +1,9 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import Navbar from '../components/Navbar';
 import { supabase } from '../lib/supabase';
-import { Check, X, User, MapPin, ArrowRight, Clock, Inbox } from 'lucide-react';
+// --- CHANGED: Added Link and ArrowLeft ---
+import { Link } from 'react-router-dom';
+import { Check, X, User, MapPin, ArrowRight, Clock, Inbox, ArrowLeft } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { format } from 'date-fns';
 
@@ -67,6 +69,11 @@ const SuperAdminChangeRequestsPage: React.FC = () => {
       <Navbar />
       <main className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <header className="mb-8">
+          {/* --- NEW: Back Button Added --- */}
+          <Link to="/super/admins" className="flex items-center text-sm text-gray-500 hover:text-gray-700 mb-4">
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back to Admin Management
+          </Link>
           <h1 className="text-3xl font-bold tracking-tight text-gray-900">Profile Change Requests</h1>
           <p className="text-lg text-gray-600 mt-1">Review and approve location changes for City Admins.</p>
         </header>

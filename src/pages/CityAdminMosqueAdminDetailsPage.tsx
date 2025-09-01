@@ -11,7 +11,7 @@ interface AdminDetails {
   id: string;
   full_name: string;
   email: string;
-  contact_number: string;
+  phone: string;
   city: string;
 }
 
@@ -128,7 +128,7 @@ const CityAdminMosqueAdminDetailsPage: React.FC = () => {
                 </div>
                 <div className="py-3 flex items-center justify-between">
                   <dt className="text-sm font-medium text-gray-500 flex items-center"><Phone className="h-5 w-5 mr-3 text-gray-400"/>Phone</dt>
-                  <dd className="text-sm text-gray-900">{details.contact_number || 'N/A'}</dd>
+                  <dd className="text-sm text-gray-900">{details.phone || 'N/A'}</dd>
                 </div>
                 <div className="py-3 flex items-center justify-between">
                   <dt className="text-sm font-medium text-gray-500 flex items-center"><MapPin className="h-5 w-5 mr-3 text-gray-400"/>City</dt>

@@ -131,7 +131,9 @@ const MosqueAdminCollectionsPage: React.FC = () => {
   const handleApprove = async (groupId: string) => {
     const toastId = toast.loading('Approving...');
     try {
-      const { error } = await supabase.from('payment_groups').update({ status: 'paid' }).eq('id', groupId);
+      // const { error } = await supabase.from('payment_groups').update({ status: 'paid' }).eq('id', groupId);
+      // if (error) throw error;
+      const { error } = await supabase.rpc('approve_payment_group', { p_group_id: groupId });
       if (error) throw error;
       toast.success('Payment approved!', { id: toastId });
       fetchData();
@@ -140,13 +142,30 @@ const MosqueAdminCollectionsPage: React.FC = () => {
     }
   };
 
+// In src/pages/MosqueAdminCollectionsPage.tsx
+
   const handleReject = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!rejectingPayment || !rejectionReason) return;
     const toastId = toast.loading('Rejecting...');
     try {
-      const { error } = await supabase.from('payment_groups').update({ status: 'rejected', rejection_reason: rejectionReason }).eq('id', rejectingPayment.id);
-      if (error) throw error;
+      // Step 1: Update the payment_groups table (your existing code)
+      const { error: groupError } = await supabase
+        .from('payment_groups')
+        .update({ status: 'rejected', rejection_reason: rejectionReason })
+        .eq('id', rejectingPayment.id);
+
+      if (groupError) throw groupError;
+
+      // --- 👇 NEW: UPDATE the related payments table records ---
+      const { error: paymentsError } = await supabase
+        .from('payments')
+        .update({ status: 'rejected', rejection_reason: rejectionReason })
+        .eq('payment_group_id', rejectingPayment.id);
+      
+      if (paymentsError) throw paymentsError;
+      // --- END of new code ---
+
       toast.success('Payment rejected.', { id: toastId });
       setRejectingPayment(null);
       setRejectionReason('');

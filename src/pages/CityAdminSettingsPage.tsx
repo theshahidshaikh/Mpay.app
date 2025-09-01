@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import Navbar from '../components/Navbar';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
-import { User, Save, Edit, X, LogOut, KeyRound, AlertCircle } from 'lucide-react';
+import { User, Save, Edit, X, LogOut, AlertCircle } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 
@@ -31,6 +31,7 @@ const CityAdminProfilePage: React.FC = () => {
 
   // State for the password change modal
   const [showPasswordModal, setShowPasswordModal] = useState(false);
+  const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmNewPassword, setConfirmNewPassword] = useState('');
 
@@ -48,7 +49,7 @@ const CityAdminProfilePage: React.FC = () => {
         const fetchedProfile = {
             full_name: profileData.full_name,
             email: profileData.email,
-            contact_number: profileData.contact_numbera,
+            contact_number: profileData.contact_number,
             city: profileData.city,
             state: profileData.state,
         };
@@ -88,7 +89,6 @@ const CityAdminProfilePage: React.FC = () => {
     const detailsChanged = profile.full_name !== originalProfile.full_name || profile.contact_number !== originalProfile.contact_number;
 
     try {
-      // Handle location change request
       if (locationChanged) {
         const { error: requestError } = await supabase.functions.invoke('request-profile-change', {
           body: { userId: user.id, newCity: profile.city, newState: profile.state },
@@ -97,7 +97,6 @@ const CityAdminProfilePage: React.FC = () => {
         toast.success('Location change request submitted for approval.', { id: toastId });
       }
 
-      // Handle other profile details update
       if (detailsChanged) {
         const { error: updateError } = await supabase
           .from('admin_profiles')
@@ -116,7 +115,7 @@ const CityAdminProfilePage: React.FC = () => {
       }
       
       setIsEditing(false);
-      fetchData(); // Refresh data to show pending status
+      fetchData(); 
     } catch (error: any) {
       toast.error(error.message || 'Failed to save changes.', { id: toastId });
     } finally {
@@ -131,27 +130,44 @@ const CityAdminProfilePage: React.FC = () => {
 
   const handlePasswordChangeSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!currentPassword) {
+      return toast.error('Please enter your current password.');
+    }
     if (newPassword !== confirmNewPassword) {
-      toast.error('New passwords do not match.');
-      return;
+      return toast.error('New passwords do not match.');
     }
     if (newPassword.length < 6) {
-      toast.error('Password must be at least 6 characters long.');
-      return;
+      return toast.error('Password must be at least 6 characters long.');
     }
-    setIsUpdating(true);
-    const toastId = toast.loading('Changing password...');
-    
-    const { error } = await supabase.auth.updateUser({ password: newPassword });
 
-    setIsUpdating(false);
-    if (error) {
-        toast.error(error.message || 'Failed to change password.', { id: toastId });
-    } else {
-        toast.success('Password changed successfully!', { id: toastId });
-        setShowPasswordModal(false);
-        setNewPassword('');
-        setConfirmNewPassword('');
+    setIsUpdating(true);
+    const toastId = toast.loading('Verifying and changing password...');
+
+    try {
+      const { error: signInError } = await supabase.auth.signInWithPassword({
+        email: profile.email,
+        password: currentPassword,
+      });
+
+      if (signInError) {
+        throw new Error('Incorrect current password. Please try again.');
+      }
+
+      const { error: updateError } = await supabase.auth.updateUser({
+        password: newPassword,
+      });
+
+      if (updateError) throw updateError;
+
+      toast.success('Password changed successfully!', { id: toastId });
+      setShowPasswordModal(false);
+      setCurrentPassword('');
+      setNewPassword('');
+      setConfirmNewPassword('');
+    } catch (error: any) {
+      toast.error(error.message || 'Failed to change password.', { id: toastId });
+    } finally {
+      setIsUpdating(false);
     }
   };
 
@@ -181,6 +197,7 @@ const CityAdminProfilePage: React.FC = () => {
     <div className="bg-gray-50 min-h-screen">
       <Navbar />
       <main className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Profile Header */}
         <div className="bg-white rounded-lg shadow-md p-6 mb-8 flex items-center space-x-6">
           <div className="flex-shrink-0 h-20 w-20 rounded-full bg-primary-100 flex items-center justify-center">
             <User className="h-10 w-10 text-primary-600" />
@@ -194,6 +211,7 @@ const CityAdminProfilePage: React.FC = () => {
           </div>
         </div>
 
+        {/* Pending Change Banner */}
         {pendingChange && (
             <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-8 rounded-r-lg">
                 <div className="flex">
@@ -209,48 +227,83 @@ const CityAdminProfilePage: React.FC = () => {
             </div>
         )}
 
+        {/* Personal Information Card */}
         <div className="bg-white p-6 rounded-lg shadow-md mb-8">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-xl font-semibold text-gray-900">Personal Information</h2>
-            {!isEditing && (
-              <button onClick={() => setIsEditing(true)} className="btn-secondary">
-                <Edit className="h-4 w-4 mr-2" />
-                Edit Profile
-              </button>
-            )}
-          </div>
-          <form onSubmit={handleUpdateProfile} className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700">Full Name</label>
-              <input type="text" value={profile.full_name} onChange={(e) => setProfile({ ...profile, full_name: e.target.value })} readOnly={!isEditing} className={`input-field mt-1 ${!isEditing ? 'bg-gray-100 cursor-not-allowed' : ''}`}/>
+          <form onSubmit={handleUpdateProfile}>
+            <div className="flex justify-between items-center mb-6 border-b pb-4">
+              <h2 className="text-xl font-semibold text-gray-900">Personal Information</h2>
+              {!isEditing && (
+                <button type="button" onClick={() => setIsEditing(true)} className="btn-secondary">
+                  <Edit className="h-4 w-4 mr-2" />
+                  Edit Profile
+                </button>
+              )}
             </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700">Contact Number</label>
-              <input type="text" value={profile.contact_number || ''} onChange={(e) => setProfile({ ...profile, contact_number: e.target.value })} readOnly={!isEditing} className={`input-field mt-1 ${!isEditing ? 'bg-gray-100 cursor-not-allowed' : ''}`}/>
+
+            <div className="space-y-6">
+              {/* Full Name Field */}
+              <div className="grid grid-cols-3 items-center">
+                <label className="block text-sm font-medium text-gray-700">Full Name</label>
+                <div className="col-span-2">
+                  {isEditing ? (
+                    <input type="text" value={profile.full_name} onChange={(e) => setProfile({ ...profile, full_name: e.target.value })} className="input-field"/>
+                  ) : (
+                    <p className="text-gray-800">{profile.full_name}</p>
+                  )}
+                </div>
+              </div>
+
+              {/* Contact Number Field */}
+              <div className="grid grid-cols-3 items-center">
+                <label className="block text-sm font-medium text-gray-700">Contact Number</label>
+                <div className="col-span-2">
+                  {isEditing ? (
+                    <input type="text" value={profile.contact_number || ''} onChange={(e) => setProfile({ ...profile, contact_number: e.target.value })} className="input-field"/>
+                  ) : (
+                    <p className="text-gray-800">{profile.contact_number || 'N/A'}</p>
+                  )}
+                </div>
+              </div>
+
+              {/* State Field */}
+              <div className="grid grid-cols-3 items-center">
+                <label className="block text-sm font-medium text-gray-700">State</label>
+                <div className="col-span-2">
+                  {isEditing ? (
+                    <input type="text" value={profile.state || ''} onChange={(e) => setProfile({ ...profile, state: e.target.value })} disabled={!!pendingChange} className={`input-field ${!!pendingChange ? 'bg-gray-100 cursor-not-allowed' : ''}`}/>
+                  ) : (
+                    <p className="text-gray-800">{profile.state}</p>
+                  )}
+                </div>
+              </div>
+
+              {/* City Field */}
+              <div className="grid grid-cols-3 items-center">
+                <label className="block text-sm font-medium text-gray-700">City</label>
+                <div className="col-span-2">
+                  {isEditing ? (
+                    <input type="text" value={profile.city || ''} onChange={(e) => setProfile({ ...profile, city: e.target.value })} disabled={!!pendingChange} className={`input-field ${!!pendingChange ? 'bg-gray-100 cursor-not-allowed' : ''}`}/>
+                  ) : (
+                    <p className="text-gray-800">{profile.city}</p>
+                  )}
+                </div>
+              </div>
             </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700">State</label>
-              <input type="text" value={profile.state || ''} onChange={(e) => setProfile({ ...profile, state: e.target.value })} readOnly={!isEditing || !!pendingChange} className={`input-field mt-1 ${(!isEditing || !!pendingChange) ? 'bg-gray-100 cursor-not-allowed' : ''}`}/>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700">City</label>
-              <input type="text" value={profile.city || ''} onChange={(e) => setProfile({ ...profile, city: e.target.value })} readOnly={!isEditing || !!pendingChange} className={`input-field mt-1 ${(!isEditing || !!pendingChange) ? 'bg-gray-100 cursor-not-allowed' : ''}`}/>
-            </div>
+
             {isEditing && (
-              <div className="pt-2 flex space-x-3 justify-end">
+              <div className="pt-6 mt-6 border-t flex justify-end space-x-3">
                 <button type="button" onClick={handleCancelEdit} className="btn-secondary">
-                  <X className="h-5 w-5 mr-2" />
-                  Cancel
+                  <X className="h-5 w-5 mr-2" /> Cancel
                 </button>
                 <button type="submit" className="btn-primary" disabled={isUpdating}>
-                  <Save className="h-5 w-5 mr-2" />
-                  {isUpdating ? 'Saving...' : 'Save Changes'}
+                  <Save className="h-5 w-5 mr-2" /> {isUpdating ? 'Saving...' : 'Save Changes'}
                 </button>
               </div>
             )}
           </form>
         </div>
 
+        {/* Security Card */}
         <div className="bg-white p-6 rounded-lg shadow-md">
           <h2 className="text-xl font-semibold text-gray-900 mb-6">Account Security</h2>
           <div className="space-y-4">
@@ -272,11 +325,22 @@ const CityAdminProfilePage: React.FC = () => {
         </div>
       </main>
 
+      {/* Password Change Modal */}
       {showPasswordModal && (
         <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-lg p-6 w-full max-w-md shadow-xl">
             <h3 className="text-lg font-medium text-gray-900 mb-4">Change Password</h3>
             <form onSubmit={handlePasswordChangeSubmit} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Current Password</label>
+                <input
+                  type="password"
+                  value={currentPassword}
+                  onChange={(e) => setCurrentPassword(e.target.value)}
+                  className="input-field mt-1"
+                  required
+                />
+              </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700">New Password</label>
                 <input type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} className="input-field mt-1" placeholder="At least 6 characters" required/>

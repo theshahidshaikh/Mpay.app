@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
-import { Building, Users, DollarSign, Search, Eye } from 'lucide-react';
+import { Building, Users, IndianRupee, Search, Eye } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 // Interface for a mosque
@@ -35,6 +35,21 @@ const MosquesPage: React.FC = () => {
   // Filter state
   const [selectedState, setSelectedState] = useState('');
   const [cityFilter, setCityFilter] = useState('');
+  // --- NEW: State to hold the debounced value for fetching ---
+  const [debouncedCity, setDebouncedCity] = useState('');
+
+  // --- NEW: useEffect to debounce the city input ---
+  useEffect(() => {
+    // Set a timer to update the debounced value after 500ms
+    const handler = setTimeout(() => {
+      setDebouncedCity(cityFilter);
+    }, 500);
+
+    // Cleanup function to clear the timer if the user types again
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [cityFilter]); // Only re-run if the direct input value changes
 
   const fetchMosques = useCallback(async () => {
     if (!user) return;
@@ -43,7 +58,8 @@ const MosquesPage: React.FC = () => {
       const { data, error } = await supabase.rpc('get_all_mosques_with_stats', {
         p_user_id: user.id,
         p_state: selectedState || null,
-        p_city: cityFilter || null,
+        // --- CHANGED: Use the debounced value for the API call ---
+        p_city: debouncedCity || null,
       });
 
       if (error) throw error;
@@ -53,7 +69,7 @@ const MosquesPage: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  }, [user, selectedState, cityFilter]);
+  }, [user, selectedState, debouncedCity]); // --- CHANGED: Depend on the debounced value ---
 
   useEffect(() => {
     if (user?.role) {
@@ -61,12 +77,12 @@ const MosquesPage: React.FC = () => {
     }
   }, [fetchMosques, user?.role]);
 
-  // --- NEW: Central navigation function ---
   const handleMosqueClick = (mosqueId: string) => {
     navigate(`/mosques/${mosqueId}`);
   };
 
-  if (loading) {
+  // --- CHANGED: Only show full-page loader on initial load ---
+  if (loading && mosques.length === 0) {
     return (
       <div>
         <Navbar />
@@ -86,7 +102,7 @@ const MosquesPage: React.FC = () => {
           <p className="text-gray-600 mt-2">View details for all active mosques.</p>
         </div>
 
-        {/* Filters (Unchanged) */}
+        {/* Filters Section remains the same */}
         {user?.role === 'super_admin' && (
           <div className="card mb-8">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -120,9 +136,11 @@ const MosquesPage: React.FC = () => {
           </div>
         )}
 
+        {/* Table Section remains the same */}
         <div className="card">
           <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
+            {/* You can add a subtle loading indicator here if you want, e.g., opacity change */}
+            <table className={`min-w-full divide-y divide-gray-200 transition-opacity ${loading ? 'opacity-50' : 'opacity-100'}`}>
               <thead className="bg-gray-50">
                 <tr>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Mosque Details</th>
@@ -133,9 +151,9 @@ const MosquesPage: React.FC = () => {
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
                 {mosques.map((mosque) => (
-                  <tr 
-                    key={mosque.id} 
-                    onClick={() => handleMosqueClick(mosque.id)} // Use the new handler function
+                  <tr
+                    key={mosque.id}
+                    onClick={() => handleMosqueClick(mosque.id)}
                     className="hover:bg-gray-50 cursor-pointer"
                   >
                     <td className="px-6 py-4 whitespace-nowrap">
@@ -150,7 +168,7 @@ const MosquesPage: React.FC = () => {
                         <Users className="h-4 w-4 text-gray-400 mr-2" /> {mosque.households_count} Households
                       </div>
                       <div className="text-sm text-gray-900 flex items-center mt-1">
-                        <DollarSign className="h-4 w-4 text-green-400 mr-2" /> ₹{mosque.total_collected.toLocaleString()} Collected
+                        <IndianRupee className="h-4 w-4 text-green-400 mr-2" /> ₹{mosque.total_collected.toLocaleString()} Collected
                       </div>
                     </td>
                     <td className="px-11 py-4 whitespace-nowrap text-sm font-medium">
@@ -158,12 +176,12 @@ const MosquesPage: React.FC = () => {
                         <Eye className="h-5 w-5" />
                       </Link>
                     </td>
-                  </tr> 
+                  </tr>
                 ))}
               </tbody>
             </table>
           </div>
-          {mosques.length === 0 && (
+          {mosques.length === 0 && !loading && (
             <div className="text-center py-8">
               <Building className="h-12 w-12 text-gray-400 mx-auto mb-4" />
               <p className="text-gray-500">No active mosques found for the selected filters.</p>
