@@ -229,6 +229,7 @@ const CityAdminsPage: React.FC = () => {
           isOpen={isModalOpen}
           onClose={handleCloseModal}
           admin={selectedAdmin}
+          onDataChange={fetchAdmins}
         />
       )}
     </div>
