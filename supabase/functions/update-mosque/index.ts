@@ -36,7 +36,7 @@ Deno.serve(async (req) => {
 
     const { mosqueId, updates } = await req.json()
     if (!mosqueId || !updates) {
-      throw new Error('Mosque ID and updates object are required.')
+      throw new Error('mosque ID and updates object are required.')
     }
 
     const supabaseAdmin = createClient(
@@ -65,7 +65,7 @@ Deno.serve(async (req) => {
 
     if (updateError) throw updateError
 
-    return new Response(JSON.stringify({ message: 'Mosque updated successfully.' }), {
+    return new Response(JSON.stringify({ message: 'mosque updated successfully.' }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       status: 200,
     })

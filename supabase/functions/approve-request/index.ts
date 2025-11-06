@@ -67,12 +67,12 @@ serve(async (req) => {
           if (updateAdminError) throw updateAdminError;
 
           // --- NEW LOGIC: Update all associated mosques ---
-          const { error: updateMosquesError } = await supabaseAdmin
+          const { error: updatemosquesError } = await supabaseAdmin
             .from('mosques')
             .update({ city: requestData.new_city, state: requestData.new_state })
             .eq('admin_id', requestData.user_id);
 
-          if (updateMosquesError) throw updateMosquesError;
+          if (updatemosquesError) throw updatemosquesError;
           // --- END NEW LOGIC ---
         }
 

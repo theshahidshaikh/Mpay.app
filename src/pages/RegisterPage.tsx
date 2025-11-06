@@ -24,8 +24,8 @@ const RegisterPage: React.FC = () => {
   // State for the new contact number field
   const [contactNumber, setContactNumber] = useState('');
 
-  const [mosquesInCity, setMosquesInCity] = useState<{ id: string; name: string }[]>([]);
-  const [selectedMosqueId, setSelectedMosqueId] = useState('');
+  const [mosquesInCity, setmosquesInCity] = useState<{ id: string; name: string }[]>([]);
+  const [selectedmosqueId, setSelectedmosqueId] = useState('');
 
   const [householdDetails, setHouseholdDetails] = useState({
     house_number: '',
@@ -35,7 +35,7 @@ const RegisterPage: React.FC = () => {
   });
 
   const [minMonthlyAmount, setMinMonthlyAmount] = useState<number | null>(null);
-  const [mosqueDetails, setMosqueDetails] = useState({ name: '', address: '', monthly_amount: '500' });
+  const [mosqueDetails, setmosqueDetails] = useState({ name: '', address: '', monthly_amount: '500' });
 
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -43,24 +43,24 @@ const RegisterPage: React.FC = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchMosques = async () => {
+    const fetchmosques = async () => {
       if (city.length < 3) {
-        setMosquesInCity([]);
+        setmosquesInCity([]);
         return;
       }
       try {
         const { data, error } = await supabase.rpc('get_mosques_by_city', { city_name: city });
         if (error) throw error;
-        setMosquesInCity(data || []);
+        setmosquesInCity(data || []);
       } catch (error) {
         console.error('Error fetching mosques:', error);
-        setMosquesInCity([]);
+        setmosquesInCity([]);
       }
     };
 
     const handler = setTimeout(() => {
       if (role === 'household') {
-        fetchMosques();
+        fetchmosques();
       }
     }, 500);
 
@@ -68,8 +68,8 @@ const RegisterPage: React.FC = () => {
   }, [city, role]);
 
   useEffect(() => {
-    const fetchMosqueDetails = async () => {
-        if (!selectedMosqueId) {
+    const fetchmosqueDetails = async () => {
+        if (!selectedmosqueId) {
             setMinMonthlyAmount(null);
             setHouseholdDetails(prev => ({ ...prev, monthly_amount: '' }));
             return;
@@ -78,7 +78,7 @@ const RegisterPage: React.FC = () => {
             const { data, error } = await supabase
                 .from('mosques')
                 .select('annual_amount')
-                .eq('id', selectedMosqueId)
+                .eq('id', selectedmosqueId)
                 .single();
             if (error) throw error;
             if (data) {
@@ -90,8 +90,8 @@ const RegisterPage: React.FC = () => {
             toast.error("Could not fetch mosque details.");
         }
     };
-    fetchMosqueDetails();
-  }, [selectedMosqueId]);
+    fetchmosqueDetails();
+  }, [selectedmosqueId]);
 
   const handleMonthlyAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setHouseholdDetails({ ...householdDetails, monthly_amount: e.target.value });
@@ -126,7 +126,7 @@ const RegisterPage: React.FC = () => {
     const body = {
       email, password, fullName, city, state, role,
       contactNumber: contactNumber, // Pass the contact number for both roles
-      mosqueId: role === 'household' ? selectedMosqueId : undefined,
+      mosqueId: role === 'household' ? selectedmosqueId : undefined,
       householdDetails: role === 'household' ? { 
         ...householdDetails, 
         male_count: maleCount,
@@ -178,8 +178,8 @@ const RegisterPage: React.FC = () => {
             <input type="text" placeholder="City" required value={city} onChange={(e) => setCity(e.target.value)} className="input-field" />
             
             <select value={role} onChange={(e) => setRole(e.target.value as any)} className="input-field">
-              <option value="household">Join a Mosque (as a Household)</option>
-              <option value="mosque_admin">Register a New Mosque (as an Admin)</option>
+              <option value="household">Join a mosque (as a Household)</option>
+              <option value="mosque_admin">Register a New mosque (as an Admin)</option>
             </select>
           </div>
           
@@ -190,17 +190,17 @@ const RegisterPage: React.FC = () => {
               <h3 className="font-semibold text-center text-gray-700">Household Details</h3>
               <p className="text-xs text-center text-gray-500 -mt-2">The person registering is considered the head of the house.</p>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Select a Mosque in {city || 'your city'}</label>
-                <select value={selectedMosqueId} onChange={(e) => setSelectedMosqueId(e.target.value)} className="input-field" required>
-                  <option value="" disabled>-- Select a Mosque --</option>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Select a mosque in {city || 'your city'}</label>
+                <select value={selectedmosqueId} onChange={(e) => setSelectedmosqueId(e.target.value)} className="input-field" required>
+                  <option value="" disabled>-- Select a mosque --</option>
                   {mosquesInCity.map((mosque) => (<option key={mosque.id} value={mosque.id}>{mosque.name}</option>))}
                 </select>
               </div>
-              <input type="text" placeholder="House Number" required value={householdDetails.house_number} onChange={(e) => setHouseholdDetails({...householdDetails, house_number: e.target.value})} className="input-field" />
+              <input type="text" placeholder="Jamat Number" required value={householdDetails.house_number} onChange={(e) => setHouseholdDetails({...householdDetails, house_number: e.target.value})} className="input-field" />
               <input type="number" placeholder="Number of Male Members" required min="0" value={householdDetails.male_count} onChange={(e) => setHouseholdDetails({...householdDetails, male_count: e.target.value})} className="input-field" />
               <input type="number" placeholder="Number of Female Members" required min="0" value={householdDetails.female_count} onChange={(e) => setHouseholdDetails({...householdDetails, female_count: e.target.value})} className="input-field" />
               
-              {selectedMosqueId && minMonthlyAmount !== null && (
+              {selectedmosqueId && minMonthlyAmount !== null && (
                 <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Your Monthly Contribution</label>
                     <input type="number" placeholder="Monthly Amount" required min={minMonthlyAmount} value={householdDetails.monthly_amount} onChange={handleMonthlyAmountChange} onBlur={handleMonthlyAmountBlur} className="input-field" />
@@ -212,12 +212,12 @@ const RegisterPage: React.FC = () => {
           
           {role === 'mosque_admin' && (
             <div className="space-y-4 p-4 border rounded-lg">
-              <h3 className="font-semibold text-center text-gray-700">New Mosque Details</h3>
-              <input type="text" placeholder="Mosque Name" required value={mosqueDetails.name} onChange={(e) => setMosqueDetails({ ...mosqueDetails, name: e.target.value })} className="input-field" />
-              <input type="text" placeholder="Mosque Address" required value={mosqueDetails.address} onChange={(e) => setMosqueDetails({ ...mosqueDetails, address: e.target.value })} className="input-field" />
+              <h3 className="font-semibold text-center text-gray-700">New mosque Details</h3>
+              <input type="text" placeholder="mosque Name" required value={mosqueDetails.name} onChange={(e) => setmosqueDetails({ ...mosqueDetails, name: e.target.value })} className="input-field" />
+              <input type="text" placeholder="mosque Address" required value={mosqueDetails.address} onChange={(e) => setmosqueDetails({ ...mosqueDetails, address: e.target.value })} className="input-field" />
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Default Monthly Amount</label>
-                <input type="number" required value={mosqueDetails.monthly_amount} onChange={(e) => setMosqueDetails({ ...mosqueDetails, monthly_amount: e.target.value })} className="input-field" />
+                <input type="number" required value={mosqueDetails.monthly_amount} onChange={(e) => setmosqueDetails({ ...mosqueDetails, monthly_amount: e.target.value })} className="input-field" />
               </div>
             </div>
           )}

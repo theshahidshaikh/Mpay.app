@@ -35,7 +35,7 @@ Deno.serve(async (req) => {
     }
 
     const { mosqueId } = await req.json()
-    if (!mosqueId) throw new Error('Mosque ID is required.')
+    if (!mosqueId) throw new Error('mosque ID is required.')
 
     const supabaseAdmin = createClient(
       Deno.env.get('SUPABASE_URL')!,
@@ -48,7 +48,7 @@ Deno.serve(async (req) => {
       .eq('id', mosqueId)
       .single()
 
-    if (mosqueError) throw new Error('Mosque not found or could not be fetched.')
+    if (mosqueError) throw new Error('mosque not found or could not be fetched.')
 
     // Security check for city-scoped admins
     if (profile.role === 'city_admin' && profile.city !== mosque.city) {
@@ -66,12 +66,12 @@ Deno.serve(async (req) => {
     if (unlinkError) throw new Error(`Failed to unlink admin: ${unlinkError.message}`)
 
     // Now, safely delete the mosque
-    const { error: deleteMosqueError } = await supabaseAdmin
+    const { error: deletemosqueError } = await supabaseAdmin
       .from('mosques')
       .delete()
       .eq('id', mosqueId)
 
-    if (deleteMosqueError) throw deleteMosqueError
+    if (deletemosqueError) throw deletemosqueError
 
     // Finally, if an admin was linked, delete their auth account.
     if (adminIdToDelete) {
@@ -79,11 +79,11 @@ Deno.serve(async (req) => {
         adminIdToDelete
       )
       if (deleteUserError) {
-        throw new Error(`Mosque was deleted, but failed to delete the admin user: ${deleteUserError.message}`);
+        throw new Error(`mosque was deleted, but failed to delete the admin user: ${deleteUserError.message}`);
       }
     }
 
-    return new Response(JSON.stringify({ message: 'Mosque and associated admin deleted successfully.' }), {
+    return new Response(JSON.stringify({ message: 'mosque and associated admin deleted successfully.' }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       status: 200,
     })

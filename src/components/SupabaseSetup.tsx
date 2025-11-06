@@ -14,7 +14,7 @@ const SupabaseSetup: React.FC = () => {
               Connect to Supabase
             </h1>
             <p className="text-gray-600">
-              To use the Mosque Collection Management App, you need to connect to Supabase
+              To use the mosque Collection Management App, you need to connect to Supabase
             </p>
           </div>
 

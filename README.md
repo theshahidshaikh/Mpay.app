@@ -1,4 +1,4 @@
-# Mosque Collection Management App
+# mosque Collection Management App
 
 A comprehensive web application for managing monthly collections from households within mosque jurisdictions.
 
@@ -6,19 +6,19 @@ A comprehensive web application for managing monthly collections from households
 
 ### 🏠 Household User Panel
 - **Registration/Login**: Account linked to one house only
-- **House Profile**: Store house number, members count, contact details
+- **House Profile**: Store Jamat Number, members count, contact details
 - **Payment Tracking**: Annual installment with monthly breakdown (Jan-Dec)
 - **Online Payments**: UPI, Card, Net Banking support
 - **Payment History**: Complete transaction history with export
 
-### 🕌 Mosque Admin Panel
+### 🕌 mosque Admin Panel
 - **Dashboard**: View all households under mosque area
-- **Search & Filter**: Find households by name, house number, or payment status
+- **Search & Filter**: Find households by name, Jamat Number, or payment status
 - **Payment Management**: Color-coded status map, manual payment entry for cash
 - **Reports**: Monthly/yearly collection summaries with CSV export
 
 ### 👑 Super Admin Panel
-- **Mosque Management**: Create and manage mosque admin accounts
+- **mosque Management**: Create and manage mosque admin accounts
 - **Global Statistics**: View system-wide payment statistics
 - **Admin Assignment**: Assign areas to mosque admins
 
@@ -33,7 +33,7 @@ A comprehensive web application for managing monthly collections from households
 Once Supabase is connected, you can create these demo accounts:
 
 - **Household User**: household@demo.com / password123
-- **Mosque Admin**: admin@demo.com / password123
+- **mosque Admin**: admin@demo.com / password123
 - **Super Admin**: super@demo.com / password123
 
 ## Technology Stack
@@ -47,7 +47,7 @@ Once Supabase is connected, you can create these demo accounts:
 
 The app automatically creates these tables:
 - `profiles` - User accounts with roles
-- `mosques` - Mosque information
+- `mosques` - mosque information
 - `households` - Household details
 - `payments` - Payment records
 

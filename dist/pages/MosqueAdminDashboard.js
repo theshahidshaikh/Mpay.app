@@ -6,7 +6,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
 import { Users, DollarSign, Search, Inbox, TrendingUp, CheckCircle } from 'lucide-react';
 import toast from 'react-hot-toast';
-const MosqueAdminDashboard = () => {
+const mosqueAdminDashboard = () => {
     const { user } = useAuth();
     const [households, setHouseholds] = useState([]);
     const [summaryStats, setSummaryStats] = useState(null);
@@ -72,4 +72,4 @@ const MosqueAdminDashboard = () => {
                                                 return (_jsxs("tr", { className: "hover:bg-gray-50", children: [_jsx("td", { className: "td text-center font-medium text-gray-900", children: h.head_of_house }), _jsx("td", { className: "td text-center font-mono", children: h.contact_number }), _jsx("td", { className: "td text-center text-green-600 font-semibold", children: h.paid_months }), _jsx("td", { className: "td text-center text-red-600 font-semibold", children: h.unpaid_months }), _jsxs("td", { className: "td text-center font-bold", children: ["\u20B9", totalDue.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })] }), _jsx("td", { className: "td text-center", children: _jsx(Link, { to: linkTo, className: "font-medium text-primary-600 hover:text-primary-800", children: "View Details" }) })] }, h.id));
                                             }) })] }) }), filteredHouseholds.length === 0 && (_jsxs("div", { className: "text-center py-12", children: [_jsx(Inbox, { className: "h-12 w-12 text-gray-400 mx-auto mb-4" }), _jsx("h3", { className: "text-lg font-medium text-gray-900", children: "No Households Found" }), _jsx("p", { className: "text-gray-500 mt-1", children: "No active households match your search criteria for the selected date range." })] }))] })] })] }));
 };
-export default MosqueAdminDashboard;
+export default mosqueAdminDashboard;

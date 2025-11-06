@@ -14,13 +14,13 @@ interface Totals {
   total_collection: number;
 }
 
-interface PendingMosque {
+interface Pendingmosque {
   id: string;
   name: string;
   admin: { full_name: string; email: string } | null;
 }
 
-interface ActiveMosque {
+interface Activemosque {
   id: string;
   name: string;
   state: string;
@@ -33,8 +33,8 @@ const CityPage: React.FC = () => {
   const { user } = useAuth();
   const { cityName } = useParams<{ cityName: string }>();
   const [totals, setTotals] = useState<Totals | null>(null);
-  const [pendingMosques, setPendingMosques] = useState<PendingMosque[]>([]);
-  const [activeMosques, setActiveMosques] = useState<ActiveMosque[]>([]);
+  const [pendingmosques, setPendingmosques] = useState<Pendingmosque[]>([]);
+  const [activemosques, setActivemosques] = useState<Activemosque[]>([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
@@ -50,8 +50,8 @@ const CityPage: React.FC = () => {
       if (error) throw error;
       if (data) {
         setTotals(data.totals);
-        setPendingMosques(data.pending_mosques || []);
-        setActiveMosques(data.active_mosques || []);
+        setPendingmosques(data.pending_mosques || []);
+        setActivemosques(data.active_mosques || []);
       }
     } catch (error: any) {
       toast.error(error.message || 'Failed to load city data.');
@@ -66,7 +66,7 @@ const CityPage: React.FC = () => {
     }
   }, [user, fetchData]);
 
-  const handleMosqueClick = (mosqueId: string) => {
+  const handlemosqueClick = (mosqueId: string) => {
     navigate(`/mosques/${mosqueId}`);
   };
 
@@ -86,7 +86,7 @@ const CityPage: React.FC = () => {
       <Navbar />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
-          <Link to={`/super/states/${encodeURIComponent(activeMosques[0]?.state || '')}`} className="flex items-center text-sm text-gray-500 hover:text-gray-700 mb-4">
+          <Link to={`/super/states/${encodeURIComponent(activemosques[0]?.state || '')}`} className="flex items-center text-sm text-gray-500 hover:text-gray-700 mb-4">
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back to State View
           </Link>
@@ -99,7 +99,7 @@ const CityPage: React.FC = () => {
           <div className="card text-center">
             <Building className="h-8 w-8 mx-auto text-primary-600 mb-2" />
             <p className="text-3xl font-bold text-gray-900">{totals?.total_mosques.toLocaleString() || 0}</p>
-            <p className="text-gray-500">Total Mosques</p>
+            <p className="text-gray-500">Total mosques</p>
           </div>
           <div className="card text-center">
             <Users className="h-8 w-8 mx-auto text-primary-600 mb-2" />
@@ -119,14 +119,14 @@ const CityPage: React.FC = () => {
         </div>
 
 
-        {/* Active Mosques Table */}
+        {/* Active mosques Table */}
         <div className="card">
-          <h2 className="text-xl font-semibold text-gray-900 mb-6">Active Mosques in {decodedCityName}</h2>
+          <h2 className="text-xl font-semibold text-gray-900 mb-6">Active mosques in {decodedCityName}</h2>
           <div className="overflow-x-auto">
             <table className="min-w-full">
               <thead className="bg-gray-50">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Mosque</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">mosque</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Admin</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Households</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Population</th>
@@ -134,8 +134,8 @@ const CityPage: React.FC = () => {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {activeMosques.map((mosque) => (
-                  <tr key={mosque.id} onClick={() => handleMosqueClick(mosque.id)} className="hover:bg-gray-50 cursor-pointer">
+                {activemosques.map((mosque) => (
+                  <tr key={mosque.id} onClick={() => handlemosqueClick(mosque.id)} className="hover:bg-gray-50 cursor-pointer">
                     <td className="px-6 py-4 whitespace-nowrap font-medium text-gray-900">{mosque.name}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-gray-600">{mosque.admin_full_name}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-gray-600">{mosque.households_count}</td>
@@ -148,7 +148,7 @@ const CityPage: React.FC = () => {
               </tbody>
             </table>
           </div>
-          {activeMosques.length === 0 && !loading && (
+          {activemosques.length === 0 && !loading && (
              <div className="text-center py-8">
                 <Building className="h-12 w-12 text-gray-400 mx-auto mb-4" />
                 <p className="text-gray-500">No active mosques found in this city.</p>

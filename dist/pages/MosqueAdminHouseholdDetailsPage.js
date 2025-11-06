@@ -6,7 +6,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
 import { ArrowLeft, Home, Phone, Check } from 'lucide-react';
 import toast from 'react-hot-toast';
-const MosqueAdminHouseholdDetailsPage = () => {
+const mosqueAdminHouseholdDetailsPage = () => {
     const { user } = useAuth();
     const { householdId } = useParams();
     const navigate = useNavigate();
@@ -100,4 +100,4 @@ const MosqueAdminHouseholdDetailsPage = () => {
                                                 (_jsxs("span", { className: "status-paid inline-flex items-center", children: [_jsx(Check, { className: "h-4 w-4 mr-1.5" }), " Paid"] })) :
                                                 (_jsx("button", { onClick: () => markPaymentAsPaid(item.month_number, item.year), className: "btn-primary-outline text-sm", children: "Mark as Paid" })) })] }, index))) })] })] })] }));
 };
-export default MosqueAdminHouseholdDetailsPage;
+export default mosqueAdminHouseholdDetailsPage;

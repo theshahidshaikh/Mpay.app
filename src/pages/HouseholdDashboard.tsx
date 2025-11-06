@@ -153,12 +153,12 @@ const HouseholdDashboard: React.FC = () => {
   }
 
   return (
-    <div className="bg-gray-50 min-h-screen">
+    <div className="bg-gray-50 min-h-screen pb-10">
       <Navbar />
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
-          <p className="text-gray-600 mt-1">Welcome back, {household?.head_of_house || user?.email}</p>
+          <p className="text-gray-600 mt-1">Assalam wailaikum, {household?.head_of_house || user?.email}</p>
         </div>
 
         {household ? (
@@ -171,9 +171,9 @@ const HouseholdDashboard: React.FC = () => {
                   Household Information
                 </h3>
                 <div className="space-y-3">
-                  <InfoRow label="House Number" value={household.house_number} />
+                  <InfoRow label="Jamat Number" value={household.house_number} />
                   <InfoRow label="Head of House" value={household.head_of_house} />
-                  <InfoRow label="Mosque" value={household.mosques?.name || 'N/A'} />
+                  <InfoRow label="Masjid" value={household.mosques?.name || 'N/A'} />
                   <InfoRow label="Contact" value={household.contact_number} />
                   <InfoRow label="Members" value={`${household.members_count} (${household.male_count}M, ${household.female_count}F)`} />
                 </div>

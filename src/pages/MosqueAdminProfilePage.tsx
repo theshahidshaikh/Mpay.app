@@ -9,20 +9,20 @@ import { useNavigate } from 'react-router-dom';
 interface Profile {
   full_name: string; email: string; contact_number: string; city: string; state: string;
 }
-interface Mosque {
+interface mosque {
   name: string; 
   address: string; 
   annual_amount: number;
   upi_id: string; // 👈 Add upi_id to the interface
 }
 
-const MosqueAdminProfilePage: React.FC = () => {
+const mosqueAdminProfilePage: React.FC = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [profile, setProfile] = useState<Profile | null>(null);
-  const [mosque, setMosque] = useState<Mosque | null>(null);
+  const [mosque, setmosque] = useState<mosque | null>(null);
   const [originalProfile, setOriginalProfile] = useState<Profile | null>(null);
-  const [originalMosque, setOriginalMosque] = useState<Mosque | null>(null);
+  const [originalmosque, setOriginalmosque] = useState<mosque | null>(null);
   const [loading, setLoading] = useState(true);
   const [isUpdating, setIsUpdating] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
@@ -38,9 +38,9 @@ const MosqueAdminProfilePage: React.FC = () => {
       if (error) throw error;
       if (data) {
         setProfile(data.profile);
-        setMosque(data.mosque);
+        setmosque(data.mosque);
         setOriginalProfile(data.profile);
-        setOriginalMosque(data.mosque);
+        setOriginalmosque(data.mosque);
       }
     } catch (error: any) {
       toast.error(error.message || 'Failed to load profile.');
@@ -65,7 +65,7 @@ const MosqueAdminProfilePage: React.FC = () => {
       if (error) throw new Error(error.message);
       toast.success('Profile updated successfully!', { id: toastId });
       setOriginalProfile(profile);
-      setOriginalMosque(mosque);
+      setOriginalmosque(mosque);
       setIsEditing(false);
     } catch (error: any) {
       toast.error(error.message || 'Failed to update profile.', { id: toastId });
@@ -76,7 +76,7 @@ const MosqueAdminProfilePage: React.FC = () => {
 
   const handleCancelEdit = () => {
     setProfile(originalProfile);
-    setMosque(originalMosque);
+    setmosque(originalmosque);
     setIsEditing(false);
   };
 
@@ -150,13 +150,13 @@ const MosqueAdminProfilePage: React.FC = () => {
                     </div>
                 </div>
 
-                {/* Mosque Details */}
+                {/* mosque Details */}
                 <div className="bg-white p-6 rounded-lg shadow-md">
-                    <h2 className="text-xl font-semibold text-gray-900 mb-6 flex items-center"><Building className="h-6 w-6 mr-3 text-primary-600"/> Mosque Details</h2>
+                    <h2 className="text-xl font-semibold text-gray-900 mb-6 flex items-center"><Building className="h-6 w-6 mr-3 text-primary-600"/> mosque Details</h2>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div><label className="label">Mosque Name</label><input type="text" value={mosque.name} onChange={(e) => setMosque({...mosque, name: e.target.value})} readOnly={!isEditing} className={`input-field ${!isEditing ? 'bg-gray-100' : ''}`}/></div>
-                        <div><label className="label">Default Annual Amount</label><input type="number" value={mosque.annual_amount} onChange={(e) => setMosque({...mosque, annual_amount: parseInt(e.target.value)})} readOnly={!isEditing} className={`input-field ${!isEditing ? 'bg-gray-100' : ''}`}/></div>
-                        <div className="md:col-span-2"><label className="label">Mosque Address</label><input type="text" value={mosque.address} onChange={(e) => setMosque({...mosque, address: e.target.value})} readOnly={!isEditing} className={`input-field ${!isEditing ? 'bg-gray-100' : ''}`}/></div>
+                        <div><label className="label">mosque Name</label><input type="text" value={mosque.name} onChange={(e) => setmosque({...mosque, name: e.target.value})} readOnly={!isEditing} className={`input-field ${!isEditing ? 'bg-gray-100' : ''}`}/></div>
+                        <div><label className="label">Default Annual Amount</label><input type="number" value={mosque.annual_amount} onChange={(e) => setmosque({...mosque, annual_amount: parseInt(e.target.value)})} readOnly={!isEditing} className={`input-field ${!isEditing ? 'bg-gray-100' : ''}`}/></div>
+                        <div className="md:col-span-2"><label className="label">mosque Address</label><input type="text" value={mosque.address} onChange={(e) => setmosque({...mosque, address: e.target.value})} readOnly={!isEditing} className={`input-field ${!isEditing ? 'bg-gray-100' : ''}`}/></div>
                         
                         {/* --- 👇 NEW UPI ID FIELD --- */}
                         <div className="md:col-span-2">
@@ -164,7 +164,7 @@ const MosqueAdminProfilePage: React.FC = () => {
                             <input 
                                 type="text" 
                                 value={mosque.upi_id || ''} 
-                                onChange={(e) => setMosque({...mosque, upi_id: e.target.value})} 
+                                onChange={(e) => setmosque({...mosque, upi_id: e.target.value})} 
                                 readOnly={!isEditing} 
                                 className={`input-field ${!isEditing ? 'bg-gray-100' : ''}`}
                                 placeholder={!isEditing ? 'Not set' : 'e.g., mosque-name@upi'}
@@ -247,4 +247,4 @@ const MosqueAdminProfilePage: React.FC = () => {
   );
 };
 
-export default MosqueAdminProfilePage;
+export default mosqueAdminProfilePage;

@@ -15,17 +15,17 @@ interface AdminDetails {
   city: string;
 }
 
-interface AssignedMosque {
+interface Assignedmosque {
   id: string;
   name: string;
 }
 
-const CityAdminMosqueAdminDetailsPage: React.FC = () => {
+const CityAdminmosqueAdminDetailsPage: React.FC = () => {
   const { user } = useAuth();
   const { adminId } = useParams<{ adminId: string }>();
   const navigate = useNavigate();
   const [details, setDetails] = useState<AdminDetails | null>(null);
-  const [mosques, setMosques] = useState<AssignedMosque[]>([]);
+  const [mosques, setmosques] = useState<Assignedmosque[]>([]);
   const [loading, setLoading] = useState(true);
 
   // State for delete modal
@@ -43,7 +43,7 @@ const CityAdminMosqueAdminDetailsPage: React.FC = () => {
       if (error) throw error;
       if (data && data.details) {
         setDetails(data.details);
-        setMosques(data.mosques || []);
+        setmosques(data.mosques || []);
       } else {
         throw new Error("Admin data not found.");
       }
@@ -102,7 +102,7 @@ const CityAdminMosqueAdminDetailsPage: React.FC = () => {
           <div className="flex flex-col sm:flex-row justify-between items-start">
             <div>
               <h1 className="text-4xl font-extrabold tracking-tight text-gray-900">{details.full_name}</h1>
-              <p className="text-lg text-gray-600 mt-1">Mosque Admin Details</p>
+              <p className="text-lg text-gray-600 mt-1">mosque Admin Details</p>
             </div>
             {user?.role === 'city_admin' && (
               <button onClick={() => setShowDeleteModal(true)} className="btn-Denger ml-4">
@@ -138,10 +138,10 @@ const CityAdminMosqueAdminDetailsPage: React.FC = () => {
             </div>
           </div>
 
-          {/* Right Column: Assigned Mosques */}
+          {/* Right Column: Assigned mosques */}
           <div className="md:col-span-2">
             <div className="bg-white p-6 rounded-lg shadow-md">
-              <h2 className="text-xl font-semibold text-gray-900 mb-4">Assigned Mosque(s)</h2>
+              <h2 className="text-xl font-semibold text-gray-900 mb-4">Assigned mosque(s)</h2>
               {mosques.length > 0 ? (
                 <ul className="divide-y divide-gray-200">
                   {mosques.map(mosque => (
@@ -157,7 +157,7 @@ const CityAdminMosqueAdminDetailsPage: React.FC = () => {
               ) : (
                 <div className="text-center py-12">
                   <Building className="h-12 w-12 text-gray-300 mx-auto mb-4" />
-                  <h3 className="text-lg font-medium text-gray-900">No Assigned Mosques</h3>
+                  <h3 className="text-lg font-medium text-gray-900">No Assigned mosques</h3>
                   <p className="text-gray-500 mt-1">This admin is not currently assigned to any active mosques.</p>
                 </div>
               )}
@@ -207,4 +207,4 @@ const CityAdminMosqueAdminDetailsPage: React.FC = () => {
   );
 };
 
-export default CityAdminMosqueAdminDetailsPage; 
+export default CityAdminmosqueAdminDetailsPage; 

@@ -45,14 +45,14 @@ const Navbar: React.FC = () => {
     } else if (user?.role === 'city_admin') {
       return [
         { icon: Home, label: 'Dashboard', path: '/city/dashboard' },
-        { icon: Building, label: 'Mosques', path: '/city/mosques' },
+        { icon: Building, label: 'mosques', path: '/city/mosques' },
         { icon: Users, label: 'Admins', path: '/city/admins' },
         { icon: User, label: 'Profile', path: '/city/profile' },
       ];
     } else if (user?.role === 'super_admin') {
       return [
         { icon: Home, label: 'Dashboard', path: '/super/dashboard' },
-        { icon: Building, label: 'Mosques', path: '/super/mosques' },
+        { icon: Building, label: 'mosques', path: '/super/mosques' },
         { icon: Users, label: 'Admins', path: '/super/admins' },
         { icon: User, label: 'Profile', path: '/super/profile' }, 
       ];
@@ -114,7 +114,7 @@ const Navbar: React.FC = () => {
       </nav>
 
       {/* Bottom Tab Navigation (for Mobile) */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-lg z-50">
+      <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-lg z-50 ">
         <div className="flex justify-around items-center h-16">
           {navItems.map((item) => {
             const Icon = item.icon;

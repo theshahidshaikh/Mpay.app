@@ -25,7 +25,7 @@ interface SummaryStats {
     total_pending: number;
 }
 
-const MosqueAdminDashboard: React.FC = () => {
+const mosqueAdminDashboard: React.FC = () => {
   const { user } = useAuth();
   const [households, setHouseholds] = useState<HouseholdReport[]>([]);
   const [summaryStats, setSummaryStats] = useState<SummaryStats | null>(null);
@@ -234,4 +234,4 @@ const MosqueAdminDashboard: React.FC = () => {
   );
 };
 
-export default MosqueAdminDashboard;
+export default mosqueAdminDashboard;

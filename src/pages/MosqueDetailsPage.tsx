@@ -7,7 +7,7 @@ import { MapPin, ArrowLeft, Users, IndianRupee, TrendingUp, User, Phone, Trash2,
 import toast from 'react-hot-toast';
 
 // Interfaces to match the function's response
-interface MosqueDetails {
+interface mosqueDetails {
   id: string;
   name: string;
   address: string;
@@ -17,7 +17,7 @@ interface MosqueDetails {
   admin_contact: string;
 }
 
-interface MosqueStats {
+interface mosqueStats {
   total_households: number;
   total_population: number;
   male_population: number;
@@ -26,12 +26,12 @@ interface MosqueStats {
   total_collected: number;
 }
 
-const MosqueDetailsPage: React.FC = () => {
+const mosqueDetailsPage: React.FC = () => {
   const { user } = useAuth();
   const { mosqueId } = useParams<{ mosqueId: string }>();
   const navigate = useNavigate();
-  const [details, setDetails] = useState<MosqueDetails | null>(null);
-  const [stats, setStats] = useState<MosqueStats | null>(null);
+  const [details, setDetails] = useState<mosqueDetails | null>(null);
+  const [stats, setStats] = useState<mosqueStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
 
@@ -54,7 +54,7 @@ const MosqueDetailsPage: React.FC = () => {
         setDetails(data.details);
         setStats(data.stats);
       } else {
-        throw new Error("Mosque data not found.");
+        throw new Error("mosque data not found.");
       }
     } catch (error: any) {
       toast.error(error.message || 'Failed to load mosque details.');
@@ -79,7 +79,7 @@ const MosqueDetailsPage: React.FC = () => {
         body: { mosqueId: details.id },
       });
       if (error) throw new Error(error.message);
-      toast.success('Mosque deleted successfully!', { id: toastId });
+      toast.success('mosque deleted successfully!', { id: toastId });
       navigate('/super/mosques');
     } catch (error: any) {
       toast.error(error.message || 'Failed to delete mosque.', { id: toastId });
@@ -125,7 +125,7 @@ const MosqueDetailsPage: React.FC = () => {
             </div>
             {(user?.role === 'super_admin' || user?.role === 'city_admin') && (
               <button onClick={() => setShowDeleteModal(true)} className="btn-Denger ml-4">
-                Delete Mosque
+                Delete mosque
               </button>
             )}
           </div>
@@ -171,7 +171,7 @@ const MosqueDetailsPage: React.FC = () => {
                 <AlertTriangle className="h-6 w-6 text-red-600" />
               </div>
               <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
-                <h3 className="text-lg leading-6 font-medium text-gray-900">Delete Mosque</h3>
+                <h3 className="text-lg leading-6 font-medium text-gray-900">Delete mosque</h3>
                 <div className="mt-2">
                   <p className="text-sm text-gray-500">
                     Are you sure you want to delete "{details.name}"? This action cannot be undone.
@@ -203,4 +203,4 @@ const MosqueDetailsPage: React.FC = () => {
   );
 };
 
-export default MosqueDetailsPage;
+export default mosqueDetailsPage;

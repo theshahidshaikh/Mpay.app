@@ -14,7 +14,7 @@ interface Totals {
   total_collection: number;
 }
 
-interface MosqueStat {
+interface mosqueStat {
   id: string;
   name: string;
   admin_full_name: string;
@@ -25,7 +25,7 @@ interface MosqueStat {
 const CityAdminDashboard: React.FC = () => {
   const { user } = useAuth();
   const [totals, setTotals] = useState<Totals | null>(null);
-  const [mosques, setMosques] = useState<MosqueStat[]>([]);
+  const [mosques, setmosques] = useState<mosqueStat[]>([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
@@ -39,7 +39,7 @@ const CityAdminDashboard: React.FC = () => {
       if (error) throw error;
       if (data) {
         setTotals(data.totals);
-        setMosques(data.mosques_list || []);
+        setmosques(data.mosques_list || []);
       }
     } catch (error: any) {
       toast.error(error.message || 'Failed to load dashboard data.');
@@ -54,7 +54,7 @@ const CityAdminDashboard: React.FC = () => {
     }
   }, [user, fetchData]);
 
-  const handleMosqueClick = (mosqueId: string) => {
+  const handlemosqueClick = (mosqueId: string) => {
     navigate(`/mosques/${mosqueId}`);
   };
 
@@ -87,7 +87,7 @@ const CityAdminDashboard: React.FC = () => {
           <div className="card text-center">
             <Building className="h-8 w-8 mx-auto text-primary-600 mb-2" />
             <p className="text-3xl font-bold text-gray-900">{totals?.total_mosques.toLocaleString() || 0}</p>
-            <p className="text-gray-500">Total Mosques</p>
+            <p className="text-gray-500">Total mosques</p>
           </div>
           <div className="card text-center">
             <Users className="h-8 w-8 mx-auto text-primary-600 mb-2" />
@@ -110,13 +110,13 @@ const CityAdminDashboard: React.FC = () => {
         <div className="card">
           <h2 className="text-xl font-semibold text-gray-900 mb-6 flex items-center">
             <Building className="h-6 w-6 mr-3 text-primary-600" />
-            Mosques in {user?.city}
+            mosques in {user?.city}
           </h2>
           <div className="overflow-x-auto">
             <table className="min-w-full">
               <thead className="bg-gray-50">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Mosque</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">mosque</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Admin</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Households</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Population</th>
@@ -125,7 +125,7 @@ const CityAdminDashboard: React.FC = () => {
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
                 {mosques.map((mosque) => (
-                  <tr key={mosque.id} onClick={() => handleMosqueClick(mosque.id)} className="hover:bg-gray-50 cursor-pointer">
+                  <tr key={mosque.id} onClick={() => handlemosqueClick(mosque.id)} className="hover:bg-gray-50 cursor-pointer">
                     <td className="px-6 py-4 whitespace-nowrap font-medium text-gray-900">{mosque.name}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-gray-600">{mosque.admin_full_name}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-gray-600">{mosque.households_count}</td>

@@ -53,7 +53,7 @@ Deno.serve(async (req) => {
     await supabaseAdmin.auth.admin.inviteUserByEmail(admin_email);
 
 
-    return new Response(JSON.stringify({ message: 'Mosque and admin created successfully!' }), {
+    return new Response(JSON.stringify({ message: 'mosque and admin created successfully!' }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       status: 200,
     });

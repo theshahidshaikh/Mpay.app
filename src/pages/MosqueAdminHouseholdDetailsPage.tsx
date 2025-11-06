@@ -25,7 +25,7 @@ interface MonthStatus {
     status: 'paid' | 'unpaid';
 }
 
-const MosqueAdminHouseholdDetailsPage: React.FC = () => {
+const mosqueAdminHouseholdDetailsPage: React.FC = () => {
   const { user } = useAuth();
   const { householdId } = useParams<{ householdId: string }>();
   const navigate = useNavigate();
@@ -210,4 +210,4 @@ const MosqueAdminHouseholdDetailsPage: React.FC = () => {
   );
 };
 
-export default MosqueAdminHouseholdDetailsPage;
+export default mosqueAdminHouseholdDetailsPage;

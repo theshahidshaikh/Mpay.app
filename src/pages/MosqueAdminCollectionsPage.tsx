@@ -33,7 +33,7 @@ interface HouseholdOption {
   name: string;
 }
 
-const MosqueAdminCollectionsPage: React.FC = () => {
+const mosqueAdminCollectionsPage: React.FC = () => {
   const { user } = useAuth();
   const [pendingPaymentGroups, setPendingPaymentGroups] = useState<PendingPaymentGroup[]>([]);
   const [transactionGroups, setTransactionGroups] = useState<PaymentGroup[]>([]);
@@ -142,7 +142,7 @@ const MosqueAdminCollectionsPage: React.FC = () => {
     }
   };
 
-// In src/pages/MosqueAdminCollectionsPage.tsx
+// In src/pages/mosqueAdminCollectionsPage.tsx
 
   const handleReject = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -431,5 +431,5 @@ const MosqueAdminCollectionsPage: React.FC = () => {
   );
 };
 
-export default MosqueAdminCollectionsPage;
+export default mosqueAdminCollectionsPage;
 

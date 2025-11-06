@@ -39,7 +39,7 @@ Deno.serve(async (req) => {
 
     // --- Role-Specific Logic ---
     if (role === 'mosque_admin') {
-      if (!mosqueDetails || !city || !state) throw new Error('Mosque details, city, and state are required.');
+      if (!mosqueDetails || !city || !state) throw new Error('mosque details, city, and state are required.');
       
       // --- FIX: Create profile in 'profiles' table, not 'admin_profiles' ---
       const { error: profileError } = await supabaseAdmin
@@ -69,7 +69,7 @@ Deno.serve(async (req) => {
           admin_id: user.id,
           status: 'pending'
         })
-      if (mosqueError) throw new Error(`Mosque Creation Error: ${mosqueError.message}`);
+      if (mosqueError) throw new Error(`mosque Creation Error: ${mosqueError.message}`);
 
     } else if (role === 'household') {
       if (!householdDetails || !mosqueId) throw new Error('Household details and a selected mosque are required.');

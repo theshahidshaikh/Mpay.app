@@ -67,8 +67,8 @@ const CityAdminAdminsPage: React.FC = () => {
     }
   };
 
-  // --- 👇 NEW FUNCTION TO HANDLE MOSQUE CLICK ---
-  const handleMosqueClick = (e: React.MouseEvent, mosqueId: string | null) => {
+  // --- 👇 NEW FUNCTION TO HANDLE mosque CLICK ---
+  const handlemosqueClick = (e: React.MouseEvent, mosqueId: string | null) => {
     e.stopPropagation(); // Prevents the row's onClick from firing
     if (mosqueId) {
       navigate(`/mosques/${mosqueId}`);
@@ -91,7 +91,7 @@ const CityAdminAdminsPage: React.FC = () => {
       <Navbar />
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <header className="mb-8">
-          <h1 className="text-3xl font-bold tracking-tight text-gray-900">Manage Mosque Admins</h1>
+          <h1 className="text-3xl font-bold tracking-tight text-gray-900">Manage mosque Admins</h1>
           <p className="text-lg text-gray-600 mt-1">Approve new admins and manage existing ones in <span className="font-medium text-primary-700">{user?.city}</span>.</p>
         </header>
 
@@ -122,7 +122,7 @@ const CityAdminAdminsPage: React.FC = () => {
         {/* --- Active Admins Table Section --- */}
         <section className="bg-white p-6 rounded-lg shadow-md">
           <h2 className="text-xl font-semibold text-gray-900 mb-6 flex items-center">
-            <User className="h-6 w-6 mr-3 text-primary-600" />Active Mosque Admins
+            <User className="h-6 w-6 mr-3 text-primary-600" />Active mosque Admins
           </h2>
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200">
@@ -130,7 +130,7 @@ const CityAdminAdminsPage: React.FC = () => {
                 <tr>
                   <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
                   <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contact</th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Assigned Mosque</th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Assigned mosque</th>
                   <th scope="col" className="relative px-6 py-3"><span className="sr-only">View</span></th>
                 </tr>
               </thead>
@@ -149,7 +149,7 @@ const CityAdminAdminsPage: React.FC = () => {
                     {/* --- 👇 MODIFIED CELL --- */}
                     <td 
                       className="px-6 py-4 whitespace-nowrap text-sm text-gray-600"
-                      onClick={(e) => handleMosqueClick(e, admin.mosque_id)}
+                      onClick={(e) => handlemosqueClick(e, admin.mosque_id)}
                     >
                       {admin.mosque_name ? (
                         <span className="flex items-center hover:text-primary-700 hover:underline">

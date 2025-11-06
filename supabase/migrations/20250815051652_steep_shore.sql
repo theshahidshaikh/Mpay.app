@@ -36,7 +36,7 @@ CREATE TABLE IF NOT EXISTS households (
   created_at timestamptz DEFAULT now(),
   updated_at timestamptz DEFAULT now(),
   UNIQUE(user_id), -- One household per user
-  UNIQUE(mosque_id, house_number) -- Unique house number per mosque
+  UNIQUE(mosque_id, house_number) -- Unique Jamat Number per mosque
 );
 
 ALTER TABLE households ENABLE ROW LEVEL SECURITY;
@@ -54,8 +54,8 @@ CREATE POLICY "Household users can update own household"
   TO authenticated
   USING (user_id = auth.uid());
 
--- Mosque admins can read households in their mosque
-CREATE POLICY "Mosque admins can read mosque households"
+-- mosque admins can read households in their mosque
+CREATE POLICY "mosque admins can read mosque households"
   ON households
   FOR SELECT
   TO authenticated

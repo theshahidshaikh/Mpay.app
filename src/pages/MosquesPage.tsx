@@ -7,7 +7,7 @@ import { Building, Users, IndianRupee, Search, Eye } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 // Interface for a mosque
-interface Mosque {
+interface mosque {
   id: string;
   name: string;
   address: string;
@@ -26,10 +26,10 @@ const indianStates = [
   "Telangana", "Tripura", "Uttar Pradesh", "Uttarakhand", "West Bengal"
 ];
 
-const MosquesPage: React.FC = () => {
+const mosquesPage: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const [mosques, setMosques] = useState<Mosque[]>([]);
+  const [mosques, setmosques] = useState<mosque[]>([]);
   const [loading, setLoading] = useState(true);
 
   // Filter state
@@ -51,7 +51,7 @@ const MosquesPage: React.FC = () => {
     };
   }, [cityFilter]); // Only re-run if the direct input value changes
 
-  const fetchMosques = useCallback(async () => {
+  const fetchmosques = useCallback(async () => {
     if (!user) return;
     setLoading(true);
     try {
@@ -63,7 +63,7 @@ const MosquesPage: React.FC = () => {
       });
 
       if (error) throw error;
-      setMosques(data || []);
+      setmosques(data || []);
     } catch (error: any) {
       toast.error(error.message || 'Failed to fetch mosques.');
     } finally {
@@ -73,11 +73,11 @@ const MosquesPage: React.FC = () => {
 
   useEffect(() => {
     if (user?.role) {
-      fetchMosques();
+      fetchmosques();
     }
-  }, [fetchMosques, user?.role]);
+  }, [fetchmosques, user?.role]);
 
-  const handleMosqueClick = (mosqueId: string) => {
+  const handlemosqueClick = (mosqueId: string) => {
     navigate(`/mosques/${mosqueId}`);
   };
 
@@ -98,7 +98,7 @@ const MosquesPage: React.FC = () => {
       <Navbar />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Mosque Management</h1>
+          <h1 className="text-3xl font-bold text-gray-900">mosque Management</h1>
           <p className="text-gray-600 mt-2">View details for all active mosques.</p>
         </div>
 
@@ -143,7 +143,7 @@ const MosquesPage: React.FC = () => {
             <table className={`min-w-full divide-y divide-gray-200 transition-opacity ${loading ? 'opacity-50' : 'opacity-100'}`}>
               <thead className="bg-gray-50">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Mosque Details</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">mosque Details</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Admin</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Stats</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
@@ -153,7 +153,7 @@ const MosquesPage: React.FC = () => {
                 {mosques.map((mosque) => (
                   <tr
                     key={mosque.id}
-                    onClick={() => handleMosqueClick(mosque.id)}
+                    onClick={() => handlemosqueClick(mosque.id)}
                     className="hover:bg-gray-50 cursor-pointer"
                   >
                     <td className="px-6 py-4 whitespace-nowrap">
@@ -193,4 +193,4 @@ const MosquesPage: React.FC = () => {
   );
 };
 
-export default MosquesPage;
+export default mosquesPage;

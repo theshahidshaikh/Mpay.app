@@ -29,8 +29,8 @@ CREATE TABLE IF NOT EXISTS mosques (
 
 ALTER TABLE mosques ENABLE ROW LEVEL SECURITY;
 
--- Mosque admins can read their own mosque
-CREATE POLICY "Mosque admins can read own mosque"
+-- mosque admins can read their own mosque
+CREATE POLICY "mosque admins can read own mosque"
   ON mosques
   FOR SELECT
   TO authenticated
@@ -48,8 +48,8 @@ CREATE POLICY "Super admins can manage mosques"
     )
   );
 
--- Mosque admins can update their own mosque
-CREATE POLICY "Mosque admins can update own mosque"
+-- mosque admins can update their own mosque
+CREATE POLICY "mosque admins can update own mosque"
   ON mosques
   FOR UPDATE
   TO authenticated

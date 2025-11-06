@@ -21,14 +21,14 @@ BEGIN
   -- Insert demo profiles if they don't exist
   INSERT INTO profiles (id, email, role, full_name, phone)
   VALUES 
-    (demo_admin_id, 'admin@demo.com', 'mosque_admin', 'Demo Mosque Admin', '+1234567890'),
+    (demo_admin_id, 'admin@demo.com', 'mosque_admin', 'Demo mosque Admin', '+1234567890'),
     (demo_household_id, 'household@demo.com', 'household', 'Demo Household User', '+1234567891'),
     (demo_super_admin_id, 'super@demo.com', 'super_admin', 'Demo Super Admin', '+1234567892')
   ON CONFLICT (id) DO NOTHING;
 
   -- Insert demo mosque
   INSERT INTO mosques (id, name, address, admin_id, annual_amount)
-  VALUES (gen_random_uuid(), 'Demo Mosque', '123 Demo Street, Demo City', demo_admin_id, 12000)
+  VALUES (gen_random_uuid(), 'Demo mosque', '123 Demo Street, Demo City', demo_admin_id, 12000)
   ON CONFLICT DO NOTHING
   RETURNING id INTO demo_mosque_id;
 

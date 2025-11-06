@@ -37,7 +37,7 @@ const Navbar = () => {
         else if (user?.role === 'city_admin') {
             return [
                 { icon: Home, label: 'Dashboard', path: '/city/dashboard' },
-                { icon: Building, label: 'Mosques', path: '/city/mosques' },
+                { icon: Building, label: 'mosques', path: '/city/mosques' },
                 { icon: Users, label: 'Admins', path: '/city/admins' },
                 { icon: User, label: 'Profile', path: '/city/profile' },
             ];
@@ -45,7 +45,7 @@ const Navbar = () => {
         else if (user?.role === 'super_admin') {
             return [
                 { icon: Home, label: 'Dashboard', path: '/super/dashboard' },
-                { icon: Building, label: 'Mosques', path: '/super/mosques' },
+                { icon: Building, label: 'mosques', path: '/super/mosques' },
                 { icon: Users, label: 'Admins', path: '/super/admins' },
                 { icon: User, label: 'Profile', path: '/super/profile' },
             ];

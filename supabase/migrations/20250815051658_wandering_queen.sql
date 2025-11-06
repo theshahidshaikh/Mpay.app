@@ -67,8 +67,8 @@ CREATE POLICY "Household users can create own payments"
     AND created_by = auth.uid()
   );
 
--- Mosque admins can read and manage payments in their mosque
-CREATE POLICY "Mosque admins can read mosque payments"
+-- mosque admins can read and manage payments in their mosque
+CREATE POLICY "mosque admins can read mosque payments"
   ON payments
   FOR SELECT
   TO authenticated
@@ -80,7 +80,7 @@ CREATE POLICY "Mosque admins can read mosque payments"
     )
   );
 
-CREATE POLICY "Mosque admins can create mosque payments"
+CREATE POLICY "mosque admins can create mosque payments"
   ON payments
   FOR INSERT
   TO authenticated

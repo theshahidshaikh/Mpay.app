@@ -53,7 +53,7 @@ const LoginPage: React.FC = () => {
               Sign in to your account
             </h2>
             <p className="mt-2 text-sm text-gray-600">
-              Mosque Collection Management System
+              mosque Collection Management System
             </p>
           </div>
 

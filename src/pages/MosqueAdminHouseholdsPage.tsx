@@ -8,7 +8,7 @@ import {
 import toast from 'react-hot-toast';
 
 // Interfaces
-interface MosqueDetails {
+interface mosqueDetails {
     name: string; address: string; city: string; state: string;
 }
 interface Household {
@@ -19,9 +19,9 @@ interface PendingHousehold {
   id: string; name: string; house_number: string; members_count: number; contact_number: string;
 }
 
-const MosqueAdminHouseholdsPage: React.FC = () => {
+const mosqueAdminHouseholdsPage: React.FC = () => {
   const { user } = useAuth();
-  const [mosqueDetails, setMosqueDetails] = useState<MosqueDetails | null>(null);
+  const [mosqueDetails, setmosqueDetails] = useState<mosqueDetails | null>(null);
   const [activeHouseholds, setActiveHouseholds] = useState<Household[]>([]);
   const [pendingHouseholds, setPendingHouseholds] = useState<PendingHousehold[]>([]);
   const [loading, setLoading] = useState(true);
@@ -41,7 +41,7 @@ const MosqueAdminHouseholdsPage: React.FC = () => {
 
       if (error) throw error;
       
-      setMosqueDetails(data.mosque_details);
+      setmosqueDetails(data.mosque_details);
       setActiveHouseholds(data.active_households || []);
       setPendingHouseholds(data.pending_households || []);
 
@@ -219,7 +219,7 @@ const MosqueAdminHouseholdsPage: React.FC = () => {
           <div className="bg-white rounded-lg p-6 w-full max-w-lg shadow-xl">
             <h3 className="text-lg font-medium text-gray-900 mb-4">Edit Household</h3>
             <form onSubmit={handleUpdateHousehold} className="space-y-4">
-                <input type="text" value={editingHousehold.house_number} onChange={(e) => setEditingHousehold({...editingHousehold, house_number: e.target.value})} className="input-field" placeholder="House Number"/>
+                <input type="text" value={editingHousehold.house_number} onChange={(e) => setEditingHousehold({...editingHousehold, house_number: e.target.value})} className="input-field" placeholder="Jamat Number"/>
                 <input type="text" value={editingHousehold.head_of_house} onChange={(e) => setEditingHousehold({...editingHousehold, head_of_house: e.target.value})} className="input-field" placeholder="Head of House"/>
                 <input type="number" value={editingHousehold.members_count} onChange={(e) => setEditingHousehold({...editingHousehold, members_count: parseInt(e.target.value)})} className="input-field" placeholder="Members Count"/>
                 <input type="text" value={editingHousehold.contact_number} onChange={(e) => setEditingHousehold({...editingHousehold, contact_number: e.target.value})} className="input-field" placeholder="Contact Number"/>
@@ -267,4 +267,4 @@ const MosqueAdminHouseholdsPage: React.FC = () => {
   );
 };
 
-export default MosqueAdminHouseholdsPage;
+export default mosqueAdminHouseholdsPage;

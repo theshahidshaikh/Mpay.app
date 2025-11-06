@@ -253,7 +253,7 @@ const submitForVerification = async () => {
 
   const totalAmount = calculateTotal();
   const upiId = household?.mosques?.upi_id || 'your-mosque@upi';
-  const upiLink = `upi://pay?pa=${upiId}&pn=Mosque%20Collection&am=${totalAmount.toFixed(2)}&cu=INR`;
+  const upiLink = `upi://pay?pa=${upiId}&pn=mosque%20Collection&am=${totalAmount.toFixed(2)}&cu=INR`;
 
   return (
     <div>
@@ -275,7 +275,7 @@ const submitForVerification = async () => {
           <h2 className="text-xl font-semibold text-gray-900 mb-4">Payment Details</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-              <p className="text-sm font-medium text-gray-600">House Number</p>
+              <p className="text-sm font-medium text-gray-600">Jamat Number</p>
               <p className="text-lg font-semibold text-gray-900">{household.house_number}</p>
             </div>
             <div>

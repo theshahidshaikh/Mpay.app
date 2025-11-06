@@ -82,7 +82,7 @@ const SuperAdminDashboard: React.FC = () => {
     labels: topStatesData.map(s => s.state),
     datasets: [
       {
-        label: 'Number of Mosques',
+        label: 'Number of mosques',
         data: topStatesData.map(s => s.mosque_count),
         backgroundColor: 'rgba(59, 130, 246, 0.5)',
         borderColor: 'rgba(59, 130, 246, 1)',
@@ -96,7 +96,7 @@ const SuperAdminDashboard: React.FC = () => {
     responsive: true,
     plugins: {
       legend: { display: false },
-      title: { display: true, text: 'Top 10 States by Mosque Count' },
+      title: { display: true, text: 'Top 10 States by mosque Count' },
     },
   };
 
@@ -129,7 +129,7 @@ const SuperAdminDashboard: React.FC = () => {
           <div className="card text-center">
             <Building className="h-8 w-8 mx-auto text-primary-600 mb-2" />
             <p className="text-3xl font-bold text-gray-900">{totals?.total_mosques.toLocaleString() || 0}</p>
-            <p className="text-gray-500">Total Mosques</p>
+            <p className="text-gray-500">Total mosques</p>
           </div>
           <div className="card text-center">
             <Users className="h-8 w-8 mx-auto text-primary-600 mb-2" />
@@ -164,7 +164,7 @@ const SuperAdminDashboard: React.FC = () => {
               <thead className="bg-gray-50">
                 <tr>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">State</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Mosques</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">mosques</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Households</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">City Admins</th>
                   <th className="relative px-6 py-3"><span className="sr-only">View</span></th>

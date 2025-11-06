@@ -2,11 +2,11 @@ import React, { useState, useEffect } from 'react';
 import Navbar from '../components/Navbar';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
-import { 
-  History, 
-  Calendar, 
-  DollarSign, 
-  CreditCard, 
+import {
+  History,
+  Calendar,
+  DollarSign,
+  CreditCard,
   Download,
   Filter,
   ArrowLeft,
@@ -68,9 +68,9 @@ const PaymentHistoryPage: React.FC = () => {
       const { data: householdData, error: householdError } = await supabase
         .from('households')
         .select(`
-          *,
-          mosque:mosques(name)
-        `)
+          *,
+          mosque:mosques(name)
+        `)
         .eq('user_id', user.id)
         .single();
 
@@ -112,7 +112,7 @@ const PaymentHistoryPage: React.FC = () => {
 
   const generateReport = () => {
     const filteredPayments = getFilteredPayments();
-    
+
     if (filteredPayments.length === 0) {
       toast.error('No payments to export');
       return;
@@ -140,7 +140,7 @@ const PaymentHistoryPage: React.FC = () => {
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
-    
+
     toast.success('Payment history exported successfully');
   };
 
@@ -204,19 +204,20 @@ const PaymentHistoryPage: React.FC = () => {
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back to Dashboard
           </button>
-          <div className="flex justify-between items-center">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900 flex items-center">
-                <History className="h-8 w-8 mr-3 text-primary-600" />
+          <div className="flex justify-between items-center md:items-start flex-col md:flex-row">
+            <div className="text-center md:text-left">
+              <h1 className="text-3xl font-bold text-gray-900 flex items-center justify-center md:justify-start">
+                {/* 🔴 Hide History icon on mobile */}
+                <History className="h-8 w-8 mr-3 text-primary-600 hidden md:block" />
                 Payment History
               </h1>
               <p className="text-gray-600 mt-2">Track all your payment transactions</p>
             </div>
-            
+
             {filteredPayments.length > 0 && (
               <button
                 onClick={generateReport}
-                className="btn-primary flex items-center"
+                className="btn-primary flex items-center mt-4 md:mt-0"
               >
                 <Download className="h-4 w-4 mr-2" />
                 Export CSV
@@ -229,11 +230,11 @@ const PaymentHistoryPage: React.FC = () => {
         {household && (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
             <div className="card">
-              <div className="flex items-center">
+              <div className="flex flex-col items-center text-center md:flex-row md:text-left">
                 <div className="p-3 rounded-full bg-primary-100">
                   <DollarSign className="h-6 w-6 text-primary-600" />
                 </div>
-                <div className="ml-4">
+                <div className="mt-4 md:mt-0 md:ml-4">
                   <h3 className="text-lg font-semibold text-gray-900">₹{totalPaid.toLocaleString()}</h3>
                   <p className="text-sm text-gray-600">Total Paid ({filterYear})</p>
                 </div>
@@ -241,11 +242,11 @@ const PaymentHistoryPage: React.FC = () => {
             </div>
 
             <div className="card">
-              <div className="flex items-center">
+              <div className="flex flex-col items-center text-center md:flex-row md:text-left">
                 <div className="p-3 rounded-full bg-green-100">
                   <CheckCircle className="h-6 w-6 text-green-600" />
                 </div>
-                <div className="ml-4">
+                <div className="mt-4 md:mt-0 md:ml-4">
                   <h3 className="text-lg font-semibold text-gray-900">{filteredPayments.length}</h3>
                   <p className="text-sm text-gray-600">Transactions</p>
                 </div>
@@ -253,11 +254,11 @@ const PaymentHistoryPage: React.FC = () => {
             </div>
 
             <div className="card">
-              <div className="flex items-center">
+              <div className="flex flex-col items-center text-center md:flex-row md:text-left">
                 <div className="p-3 rounded-full bg-blue-100">
                   <Receipt className="h-6 w-6 text-blue-600" />
                 </div>
-                <div className="ml-4">
+                <div className="mt-4 md:mt-0 md:ml-4">
                   <h3 className="text-lg font-semibold text-gray-900">{household.house_number}</h3>
                   <p className="text-sm text-gray-600">House Number</p>
                 </div>
@@ -268,58 +269,69 @@ const PaymentHistoryPage: React.FC = () => {
 
         {/* Filters */}
         <div className="card mb-8">
-          <div className="flex flex-wrap gap-4 items-center">
+          <div className="flex flex-col gap-4">
+            {/* Header */}
             <div className="flex items-center">
               <Filter className="h-5 w-5 text-gray-400 mr-2" />
-              <span className="text-sm font-medium text-gray-700">Filters:</span>
+              <span className="text-base font-medium text-gray-700">Filters</span>
             </div>
 
-            <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1">Year</label>
-              <select
-                value={filterYear}
-                onChange={(e) => setFilterYear(parseInt(e.target.value))}
-                className="text-sm border-gray-300 rounded-md"
-              >
-                {availableYears.map(year => (
-                  <option key={year} value={year}>{year}</option>
-                ))}
-              </select>
-            </div>
+            {/* Filter Controls */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+              {/* Year */}
+              <div className="flex flex-col">
+                <label className="block text-xs font-medium text-gray-600 mb-1">Year</label>
+                <select
+                  value={filterYear}
+                  onChange={(e) => setFilterYear(parseInt(e.target.value))}
+                  className="text-sm border border-gray-300 rounded-md px-3 py-2"
+                >
+                  {availableYears.map((year) => (
+                    <option key={year} value={year}>
+                      {year}
+                    </option>
+                  ))}
+                </select>
+              </div>
 
-            <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1">Payment Method</label>
-              <select
-                value={filterMethod}
-                onChange={(e) => setFilterMethod(e.target.value)}
-                className="text-sm border-gray-300 rounded-md"
-              >
-                {paymentMethods.map(method => (
-                  <option key={method} value={method}>
-                    {method === 'all' ? 'All Methods' : method.toUpperCase()}
-                  </option>
-                ))}
-              </select>
-            </div>
+              {/* Payment Method */}
+              <div className="flex flex-col">
+                <label className="block text-xs font-medium text-gray-600 mb-1">Payment Method</label>
+                <select
+                  value={filterMethod}
+                  onChange={(e) => setFilterMethod(e.target.value)}
+                  className="text-sm border border-gray-300 rounded-md px-3 py-2"
+                >
+                  {paymentMethods.map((method) => (
+                    <option key={method} value={method}>
+                      {method === 'all' ? 'All Methods' : method.toUpperCase()}
+                    </option>
+                  ))}
+                </select>
+              </div>
 
-            <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1">Sort Order</label>
-              <select
-                value={sortOrder}
-                onChange={(e) => setSortOrder(e.target.value as 'desc' | 'asc')}
-                className="text-sm border-gray-300 rounded-md"
-              >
-                <option value="desc">Newest First</option>
-                <option value="asc">Oldest First</option>
-              </select>
+              {/* Sort Order */}
+              <div className="flex flex-col">
+                <label className="block text-xs font-medium text-gray-600 mb-1">Sort Order</label>
+                <select
+                  value={sortOrder}
+                  onChange={(e) => setSortOrder(e.target.value as 'desc' | 'asc')}
+                  className="text-sm border border-gray-300 rounded-md px-3 py-2"
+                >
+                  <option value="desc">Newest First</option>
+                  <option value="asc">Oldest First</option>
+                </select>
+              </div>
             </div>
           </div>
         </div>
 
+
+
         {/* Payment History Display */}
         <div className="card">
           <h2 className="text-xl font-semibold text-gray-900 mb-6">Transaction History</h2>
-          
+
           {filteredPayments.length === 0 ? (
             <div className="text-center py-12">
               <History className="h-12 w-12 text-gray-400 mx-auto mb-4" />
@@ -338,7 +350,7 @@ const PaymentHistoryPage: React.FC = () => {
             </div>
           ) : (
             <div>
-              {/* --- 👇 NEW: Mobile Card View --- */}
+              {/* --- Mobile Card View --- */}
               <div className="space-y-4 md:hidden">
                 {filteredPayments.map((payment) => (
                   <div key={payment.id} className="bg-gray-50 p-4 rounded-lg border">
