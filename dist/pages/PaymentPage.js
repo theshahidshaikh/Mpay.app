@@ -3,7 +3,7 @@ import { useState, useEffect, useCallback } from 'react';
 import Navbar from '../components/Navbar';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
-import { Calendar, DollarSign, CheckCircle, XCircle, AlertCircle, ArrowLeft, Upload } from 'lucide-react';
+import { Calendar, CheckCircle, XCircle, AlertCircle, ArrowLeft, Upload, } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 const PaymentPage = () => {
@@ -40,6 +40,7 @@ const PaymentPage = () => {
                 return;
             }
             setHousehold(householdData);
+            console.log('Fetched household data:', householdData);
             const { data: paymentsData, error: paymentsError } = await supabase
                 .from('payments')
                 .select('*')
@@ -83,6 +84,10 @@ const PaymentPage = () => {
         }
     };
     const submitForVerification = async () => {
+        console.log('--- RLS DEBUGGING ---');
+        console.log('Current User ID (auth.uid):', user?.id);
+        console.log('Household ID being paid for:', household?.id);
+        console.log('---------------------');
         if (!household || selectedMonths.length === 0 || !screenshotFile) {
             toast.error("Please select at least one month and upload a screenshot.");
             return;
@@ -118,8 +123,9 @@ const PaymentPage = () => {
                 household_id: household.id,
                 total_amount: totalAmount,
                 screenshot_url: publicUrl,
-                status: 'pending_verification',
+                status: 'pending',
                 paid_at: paymentDate,
+                created_by: user?.id,
             })
                 .select()
                 .single();
@@ -131,7 +137,7 @@ const PaymentPage = () => {
                 const existingPayment = currentPayments.find(p => p.month === month);
                 if (existingPayment && existingPayment.status === 'rejected') {
                     return supabase.from('payments').update({
-                        status: 'pending_verification',
+                        status: 'pending',
                         receipt_url: publicUrl,
                         payment_date: paymentDate,
                         payment_group_id: groupId,
@@ -146,7 +152,7 @@ const PaymentPage = () => {
                         month,
                         year: currentYear,
                         payment_method: 'upi',
-                        status: 'pending_verification',
+                        status: 'pending',
                         receipt_url: publicUrl,
                         payment_group_id: groupId,
                         created_by: user?.id,
@@ -184,12 +190,12 @@ const PaymentPage = () => {
     const totalAmount = calculateTotal();
     const upiId = household?.mosques?.upi_id || 'your-mosque@upi';
     const upiLink = `upi://pay?pa=${upiId}&pn=mosque%20Collection&am=${totalAmount.toFixed(2)}&cu=INR`;
-    return (_jsxs("div", { children: [_jsx(Navbar, {}), _jsxs("div", { className: "max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-20", children: [_jsxs("div", { className: "mb-8", children: [_jsxs("button", { onClick: () => navigate('/household/dashboard'), className: "hidden md:flex items-center text-primary-600 hover:text-primary-700 mb-4", children: [_jsx(ArrowLeft, { className: "h-4 w-4 mr-2" }), "Back to Dashboard"] }), _jsx("h1", { className: "text-3xl font-bold text-gray-900", children: "Make Payment" }), _jsx("p", { className: "text-gray-600 mt-2", children: "Pay your monthly mosque collection via UPI and upload a receipt." })] }), _jsxs("div", { className: "card mb-8", children: [_jsx("h2", { className: "text-xl font-semibold text-gray-900 mb-4", children: "Payment Details" }), _jsxs("div", { className: "grid grid-cols-1 md:grid-cols-3 gap-4", children: [_jsxs("div", { children: [_jsx("p", { className: "text-sm font-medium text-gray-600", children: "Jamat Number" }), _jsx("p", { className: "text-lg font-semibold text-gray-900", children: household.house_number })] }), _jsxs("div", { children: [_jsx("p", { className: "text-sm font-medium text-gray-600", children: "Head of House" }), _jsx("p", { className: "text-lg font-semibold text-gray-900", children: household.head_of_house })] }), _jsxs("div", { children: [_jsx("p", { className: "text-sm font-medium text-gray-600", children: "Monthly Amount" }), _jsxs("p", { className: "text-lg font-semibold text-primary-600 flex items-center", children: [_jsx(DollarSign, { className: "h-5 w-5 mr-1" }), "\u20B9", (household.annual_amount / 12).toFixed(0)] })] })] })] }), _jsxs("div", { className: "card mb-8", children: [_jsxs("h2", { className: "text-xl font-semibold text-gray-900 mb-6 flex items-center", children: [_jsx(Calendar, { className: "h-6 w-6 mr-2 text-primary-600" }), "Select Months to Pay (", currentYear, ")"] }), _jsx("div", { className: "grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-6", children: months.map((month, index) => {
+    return (_jsxs("div", { children: [_jsx(Navbar, {}), _jsxs("div", { className: "max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-20", children: [_jsxs("div", { className: "mb-8", children: [_jsxs("button", { onClick: () => navigate('/household/dashboard'), className: "hidden md:flex items-center text-primary-600 hover:text-primary-700 mb-4", children: [_jsx(ArrowLeft, { className: "h-4 w-4 mr-2" }), "Back to Dashboard"] }), _jsx("h1", { className: "text-3xl font-bold text-gray-900", children: "Make Payment" }), _jsx("p", { className: "text-gray-600 mt-2", children: "Pay your monthly mosque collection via UPI and upload a receipt." })] }), _jsxs("div", { className: "card mb-8", children: [_jsx("h2", { className: "text-xl font-semibold text-gray-900 mb-4", children: "Payment Details" }), _jsxs("div", { className: "grid grid-cols-1 md:grid-cols-3 gap-4", children: [_jsxs("div", { children: [_jsx("p", { className: "text-sm font-medium text-gray-600", children: "Jamat Number" }), _jsx("p", { className: "text-lg font-semibold text-gray-900", children: household.house_number })] }), _jsxs("div", { children: [_jsx("p", { className: "text-sm font-medium text-gray-600", children: "Head of House" }), _jsx("p", { className: "text-lg font-semibold text-gray-900", children: household.head_of_house })] }), _jsxs("div", { children: [_jsx("p", { className: "text-sm font-medium text-gray-600", children: "Monthly Amount" }), _jsxs("p", { className: "text-lg font-semibold text-primary-600 flex items-center", children: ["\u20B9", (household.annual_amount / 12).toFixed(0)] })] })] })] }), _jsxs("div", { className: "card mb-8", children: [_jsxs("h2", { className: "text-xl font-semibold text-gray-900 mb-6 flex items-center", children: [_jsx(Calendar, { className: "h-6 w-6 mr-2 text-primary-600" }), "Select Months to Pay (", currentYear, ")"] }), _jsx("div", { className: "grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-6", children: months.map((month, index) => {
                                     const monthNumber = index + 1;
                                     const status = getPaymentForMonth(monthNumber)?.status || 'unpaid';
                                     const isSelected = selectedMonths.includes(monthNumber);
                                     const isPaid = status === 'paid';
-                                    const isPending = status === 'pending_verification';
+                                    const isPending = status === 'pending';
                                     const isRejected = status === 'rejected';
                                     return (_jsxs("button", { onClick: () => handleMonthSelect(monthNumber), disabled: isPaid || isPending, className: `p-4 rounded-lg border-2 transition-all duration-200 text-left ${isPaid ? 'border-green-200 bg-green-50 cursor-not-allowed'
                                             : isPending ? 'border-yellow-300 bg-yellow-50 cursor-not-allowed'

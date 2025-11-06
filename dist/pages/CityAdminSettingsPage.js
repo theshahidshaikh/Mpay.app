@@ -17,6 +17,7 @@ const CityAdminProfilePage = () => {
     const [pendingChange, setPendingChange] = useState(null);
     // State for the password change modal
     const [showPasswordModal, setShowPasswordModal] = useState(false);
+    const [currentPassword, setCurrentPassword] = useState('');
     const [newPassword, setNewPassword] = useState('');
     const [confirmNewPassword, setConfirmNewPassword] = useState('');
     const fetchData = useCallback(async () => {
@@ -34,7 +35,7 @@ const CityAdminProfilePage = () => {
                 const fetchedProfile = {
                     full_name: profileData.full_name,
                     email: profileData.email,
-                    contact_number: profileData.contact_numbera,
+                    contact_number: profileData.contact_number,
                     city: profileData.city,
                     state: profileData.state,
                 };
@@ -71,7 +72,6 @@ const CityAdminProfilePage = () => {
         const locationChanged = profile.city !== originalProfile.city || profile.state !== originalProfile.state;
         const detailsChanged = profile.full_name !== originalProfile.full_name || profile.contact_number !== originalProfile.contact_number;
         try {
-            // Handle location change request
             if (locationChanged) {
                 const { error: requestError } = await supabase.functions.invoke('request-profile-change', {
                     body: { userId: user.id, newCity: profile.city, newState: profile.state },
@@ -80,7 +80,6 @@ const CityAdminProfilePage = () => {
                     throw new Error(requestError.message);
                 toast.success('Location change request submitted for approval.', { id: toastId });
             }
-            // Handle other profile details update
             if (detailsChanged) {
                 const { error: updateError } = await supabase
                     .from('admin_profiles')
@@ -97,7 +96,7 @@ const CityAdminProfilePage = () => {
                 toast.success('No changes to save.');
             }
             setIsEditing(false);
-            fetchData(); // Refresh data to show pending status
+            fetchData();
         }
         catch (error) {
             toast.error(error.message || 'Failed to save changes.', { id: toastId });
@@ -112,26 +111,41 @@ const CityAdminProfilePage = () => {
     };
     const handlePasswordChangeSubmit = async (e) => {
         e.preventDefault();
+        if (!currentPassword) {
+            return toast.error('Please enter your current password.');
+        }
         if (newPassword !== confirmNewPassword) {
-            toast.error('New passwords do not match.');
-            return;
+            return toast.error('New passwords do not match.');
         }
         if (newPassword.length < 6) {
-            toast.error('Password must be at least 6 characters long.');
-            return;
+            return toast.error('Password must be at least 6 characters long.');
         }
         setIsUpdating(true);
-        const toastId = toast.loading('Changing password...');
-        const { error } = await supabase.auth.updateUser({ password: newPassword });
-        setIsUpdating(false);
-        if (error) {
-            toast.error(error.message || 'Failed to change password.', { id: toastId });
-        }
-        else {
+        const toastId = toast.loading('Verifying and changing password...');
+        try {
+            const { error: signInError } = await supabase.auth.signInWithPassword({
+                email: profile.email,
+                password: currentPassword,
+            });
+            if (signInError) {
+                throw new Error('Incorrect current password. Please try again.');
+            }
+            const { error: updateError } = await supabase.auth.updateUser({
+                password: newPassword,
+            });
+            if (updateError)
+                throw updateError;
             toast.success('Password changed successfully!', { id: toastId });
             setShowPasswordModal(false);
+            setCurrentPassword('');
             setNewPassword('');
             setConfirmNewPassword('');
+        }
+        catch (error) {
+            toast.error(error.message || 'Failed to change password.', { id: toastId });
+        }
+        finally {
+            setIsUpdating(false);
         }
     };
     const handleLogout = async () => {
@@ -148,6 +162,6 @@ const CityAdminProfilePage = () => {
     if (loading) {
         return (_jsxs("div", { className: "bg-gray-50 min-h-screen", children: [_jsx(Navbar, {}), _jsx("div", { className: "flex items-center justify-center pt-32", children: _jsx("div", { className: "animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600" }) })] }));
     }
-    return (_jsxs("div", { className: "bg-gray-50 min-h-screen", children: [_jsx(Navbar, {}), _jsxs("main", { className: "max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8", children: [_jsxs("div", { className: "bg-white rounded-lg shadow-md p-6 mb-8 flex items-center space-x-6", children: [_jsx("div", { className: "flex-shrink-0 h-20 w-20 rounded-full bg-primary-100 flex items-center justify-center", children: _jsx(User, { className: "h-10 w-10 text-primary-600" }) }), _jsxs("div", { children: [_jsx("h1", { className: "text-2xl font-bold text-gray-900", children: profile.full_name }), _jsx("p", { className: "text-gray-600", children: profile.email }), _jsx("span", { className: "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 mt-2", children: "City Administrator" })] })] }), pendingChange && (_jsx("div", { className: "bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-8 rounded-r-lg", children: _jsxs("div", { className: "flex", children: [_jsx("div", { className: "flex-shrink-0", children: _jsx(AlertCircle, { className: "h-5 w-5 text-yellow-400" }) }), _jsx("div", { className: "ml-3", children: _jsxs("p", { className: "text-sm text-yellow-700", children: ["You have a pending request to change your location to ", _jsxs("span", { className: "font-medium", children: [pendingChange.new_city, ", ", pendingChange.new_state] }), "."] }) })] }) })), _jsxs("div", { className: "bg-white p-6 rounded-lg shadow-md mb-8", children: [_jsxs("div", { className: "flex justify-between items-center mb-6", children: [_jsx("h2", { className: "text-xl font-semibold text-gray-900", children: "Personal Information" }), !isEditing && (_jsxs("button", { onClick: () => setIsEditing(true), className: "btn-secondary", children: [_jsx(Edit, { className: "h-4 w-4 mr-2" }), "Edit Profile"] }))] }), _jsxs("form", { onSubmit: handleUpdateProfile, className: "space-y-4", children: [_jsxs("div", { children: [_jsx("label", { className: "block text-sm font-medium text-gray-700", children: "Full Name" }), _jsx("input", { type: "text", value: profile.full_name, onChange: (e) => setProfile({ ...profile, full_name: e.target.value }), readOnly: !isEditing, className: `input-field mt-1 ${!isEditing ? 'bg-gray-100 cursor-not-allowed' : ''}` })] }), _jsxs("div", { children: [_jsx("label", { className: "block text-sm font-medium text-gray-700", children: "Contact Number" }), _jsx("input", { type: "text", value: profile.contact_number || '', onChange: (e) => setProfile({ ...profile, contact_number: e.target.value }), readOnly: !isEditing, className: `input-field mt-1 ${!isEditing ? 'bg-gray-100 cursor-not-allowed' : ''}` })] }), _jsxs("div", { children: [_jsx("label", { className: "block text-sm font-medium text-gray-700", children: "State" }), _jsx("input", { type: "text", value: profile.state || '', onChange: (e) => setProfile({ ...profile, state: e.target.value }), readOnly: !isEditing || !!pendingChange, className: `input-field mt-1 ${(!isEditing || !!pendingChange) ? 'bg-gray-100 cursor-not-allowed' : ''}` })] }), _jsxs("div", { children: [_jsx("label", { className: "block text-sm font-medium text-gray-700", children: "City" }), _jsx("input", { type: "text", value: profile.city || '', onChange: (e) => setProfile({ ...profile, city: e.target.value }), readOnly: !isEditing || !!pendingChange, className: `input-field mt-1 ${(!isEditing || !!pendingChange) ? 'bg-gray-100 cursor-not-allowed' : ''}` })] }), isEditing && (_jsxs("div", { className: "pt-2 flex space-x-3 justify-end", children: [_jsxs("button", { type: "button", onClick: handleCancelEdit, className: "btn-secondary", children: [_jsx(X, { className: "h-5 w-5 mr-2" }), "Cancel"] }), _jsxs("button", { type: "submit", className: "btn-primary", disabled: isUpdating, children: [_jsx(Save, { className: "h-5 w-5 mr-2" }), isUpdating ? 'Saving...' : 'Save Changes'] })] }))] })] }), _jsxs("div", { className: "bg-white p-6 rounded-lg shadow-md", children: [_jsx("h2", { className: "text-xl font-semibold text-gray-900 mb-6", children: "Account Security" }), _jsxs("div", { className: "space-y-4", children: [_jsxs("div", { className: "flex justify-between items-center p-4 border rounded-lg", children: [_jsxs("div", { children: [_jsx("h3", { className: "font-medium text-gray-800", children: "Password" }), _jsx("p", { className: "text-sm text-gray-500", children: "Change your password to keep your account secure." })] }), _jsx("button", { onClick: () => setShowPasswordModal(true), className: "btn-secondary", children: "Change" })] }), _jsxs("div", { className: "flex justify-between items-center p-4 border rounded-lg bg-red-50 border-red-200", children: [_jsxs("div", { children: [_jsx("h3", { className: "font-medium text-red-800", children: "Log Out" }), _jsx("p", { className: "text-sm text-red-600", children: "You will be returned to the login screen." })] }), _jsxs("button", { onClick: handleLogout, className: "btn-danger-outline", children: [_jsx(LogOut, { className: "h-4 w-4 mr-2" }), "Log Out"] })] })] })] })] }), showPasswordModal && (_jsx("div", { className: "fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-4 z-50", children: _jsxs("div", { className: "bg-white rounded-lg p-6 w-full max-w-md shadow-xl", children: [_jsx("h3", { className: "text-lg font-medium text-gray-900 mb-4", children: "Change Password" }), _jsxs("form", { onSubmit: handlePasswordChangeSubmit, className: "space-y-4", children: [_jsxs("div", { children: [_jsx("label", { className: "block text-sm font-medium text-gray-700", children: "New Password" }), _jsx("input", { type: "password", value: newPassword, onChange: (e) => setNewPassword(e.target.value), className: "input-field mt-1", placeholder: "At least 6 characters", required: true })] }), _jsxs("div", { children: [_jsx("label", { className: "block text-sm font-medium text-gray-700", children: "Confirm New Password" }), _jsx("input", { type: "password", value: confirmNewPassword, onChange: (e) => setConfirmNewPassword(e.target.value), className: "input-field mt-1", required: true })] }), _jsx("div", { className: "pt-4 flex justify-end items-center", children: _jsxs("div", { className: "space-x-3", children: [_jsx("button", { type: "button", onClick: () => setShowPasswordModal(false), className: "btn-secondary", children: "Cancel" }), _jsx("button", { type: "submit", className: "btn-primary", disabled: isUpdating, children: isUpdating ? 'Saving...' : 'Save' })] }) })] })] }) }))] }));
+    return (_jsxs("div", { className: "bg-gray-50 min-h-screen", children: [_jsx(Navbar, {}), _jsxs("main", { className: "max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8", children: [_jsxs("div", { className: "bg-white rounded-lg shadow-md p-6 mb-8 flex items-center space-x-6", children: [_jsx("div", { className: "flex-shrink-0 h-20 w-20 rounded-full bg-primary-100 flex items-center justify-center", children: _jsx(User, { className: "h-10 w-10 text-primary-600" }) }), _jsxs("div", { children: [_jsx("h1", { className: "text-2xl font-bold text-gray-900", children: profile.full_name }), _jsx("p", { className: "text-gray-600", children: profile.email }), _jsx("span", { className: "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 mt-2", children: "City Administrator" })] })] }), pendingChange && (_jsx("div", { className: "bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-8 rounded-r-lg", children: _jsxs("div", { className: "flex", children: [_jsx("div", { className: "flex-shrink-0", children: _jsx(AlertCircle, { className: "h-5 w-5 text-yellow-400" }) }), _jsx("div", { className: "ml-3", children: _jsxs("p", { className: "text-sm text-yellow-700", children: ["You have a pending request to change your location to ", _jsxs("span", { className: "font-medium", children: [pendingChange.new_city, ", ", pendingChange.new_state] }), "."] }) })] }) })), _jsx("div", { className: "bg-white p-6 rounded-lg shadow-md mb-8", children: _jsxs("form", { onSubmit: handleUpdateProfile, children: [_jsxs("div", { className: "flex justify-between items-center mb-6 border-b pb-4", children: [_jsx("h2", { className: "text-xl font-semibold text-gray-900", children: "Personal Information" }), !isEditing && (_jsxs("button", { type: "button", onClick: () => setIsEditing(true), className: "btn-secondary", children: [_jsx(Edit, { className: "h-4 w-4 mr-2" }), "Edit Profile"] }))] }), _jsxs("div", { className: "space-y-6", children: [_jsxs("div", { className: "grid grid-cols-3 items-center", children: [_jsx("label", { className: "block text-sm font-medium text-gray-700", children: "Full Name" }), _jsx("div", { className: "col-span-2", children: isEditing ? (_jsx("input", { type: "text", value: profile.full_name, onChange: (e) => setProfile({ ...profile, full_name: e.target.value }), className: "input-field" })) : (_jsx("p", { className: "text-gray-800", children: profile.full_name })) })] }), _jsxs("div", { className: "grid grid-cols-3 items-center", children: [_jsx("label", { className: "block text-sm font-medium text-gray-700", children: "Contact Number" }), _jsx("div", { className: "col-span-2", children: isEditing ? (_jsx("input", { type: "text", value: profile.contact_number || '', onChange: (e) => setProfile({ ...profile, contact_number: e.target.value }), className: "input-field" })) : (_jsx("p", { className: "text-gray-800", children: profile.contact_number || 'N/A' })) })] }), _jsxs("div", { className: "grid grid-cols-3 items-center", children: [_jsx("label", { className: "block text-sm font-medium text-gray-700", children: "State" }), _jsx("div", { className: "col-span-2", children: isEditing ? (_jsx("input", { type: "text", value: profile.state || '', onChange: (e) => setProfile({ ...profile, state: e.target.value }), disabled: !!pendingChange, className: `input-field ${!!pendingChange ? 'bg-gray-100 cursor-not-allowed' : ''}` })) : (_jsx("p", { className: "text-gray-800", children: profile.state })) })] }), _jsxs("div", { className: "grid grid-cols-3 items-center", children: [_jsx("label", { className: "block text-sm font-medium text-gray-700", children: "City" }), _jsx("div", { className: "col-span-2", children: isEditing ? (_jsx("input", { type: "text", value: profile.city || '', onChange: (e) => setProfile({ ...profile, city: e.target.value }), disabled: !!pendingChange, className: `input-field ${!!pendingChange ? 'bg-gray-100 cursor-not-allowed' : ''}` })) : (_jsx("p", { className: "text-gray-800", children: profile.city })) })] })] }), isEditing && (_jsxs("div", { className: "pt-6 mt-6 border-t flex justify-end space-x-3", children: [_jsxs("button", { type: "button", onClick: handleCancelEdit, className: "btn-secondary", children: [_jsx(X, { className: "h-5 w-5 mr-2" }), " Cancel"] }), _jsxs("button", { type: "submit", className: "btn-primary", disabled: isUpdating, children: [_jsx(Save, { className: "h-5 w-5 mr-2" }), " ", isUpdating ? 'Saving...' : 'Save Changes'] })] }))] }) }), _jsxs("div", { className: "bg-white p-6 rounded-lg shadow-md", children: [_jsx("h2", { className: "text-xl font-semibold text-gray-900 mb-6", children: "Account Security" }), _jsxs("div", { className: "space-y-4", children: [_jsxs("div", { className: "flex justify-between items-center p-4 border rounded-lg", children: [_jsxs("div", { children: [_jsx("h3", { className: "font-medium text-gray-800", children: "Password" }), _jsx("p", { className: "text-sm text-gray-500", children: "Change your password to keep your account secure." })] }), _jsx("button", { onClick: () => setShowPasswordModal(true), className: "btn-secondary", children: "Change" })] }), _jsxs("div", { className: "flex justify-between items-center p-4 border rounded-lg bg-red-50 border-red-200", children: [_jsxs("div", { children: [_jsx("h3", { className: "font-medium text-red-800", children: "Log Out" }), _jsx("p", { className: "text-sm text-red-600", children: "You will be returned to the login screen." })] }), _jsxs("button", { onClick: handleLogout, className: "btn-danger-outline", children: [_jsx(LogOut, { className: "h-4 w-4 mr-2" }), "Log Out"] })] })] })] })] }), showPasswordModal && (_jsx("div", { className: "fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-4 z-50", children: _jsxs("div", { className: "bg-white rounded-lg p-6 w-full max-w-md shadow-xl", children: [_jsx("h3", { className: "text-lg font-medium text-gray-900 mb-4", children: "Change Password" }), _jsxs("form", { onSubmit: handlePasswordChangeSubmit, className: "space-y-4", children: [_jsxs("div", { children: [_jsx("label", { className: "block text-sm font-medium text-gray-700", children: "Current Password" }), _jsx("input", { type: "password", value: currentPassword, onChange: (e) => setCurrentPassword(e.target.value), className: "input-field mt-1", required: true })] }), _jsxs("div", { children: [_jsx("label", { className: "block text-sm font-medium text-gray-700", children: "New Password" }), _jsx("input", { type: "password", value: newPassword, onChange: (e) => setNewPassword(e.target.value), className: "input-field mt-1", placeholder: "At least 6 characters", required: true })] }), _jsxs("div", { children: [_jsx("label", { className: "block text-sm font-medium text-gray-700", children: "Confirm New Password" }), _jsx("input", { type: "password", value: confirmNewPassword, onChange: (e) => setConfirmNewPassword(e.target.value), className: "input-field mt-1", required: true })] }), _jsx("div", { className: "pt-4 flex justify-end items-center", children: _jsxs("div", { className: "space-x-3", children: [_jsx("button", { type: "button", onClick: () => setShowPasswordModal(false), className: "btn-secondary", children: "Cancel" }), _jsx("button", { type: "submit", className: "btn-primary", disabled: isUpdating, children: isUpdating ? 'Saving...' : 'Save' })] }) })] })] }) }))] }));
 };
 export default CityAdminProfilePage;

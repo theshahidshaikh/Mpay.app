@@ -284,7 +284,7 @@ const mosqueAdminCollectionsPage: React.FC = () => {
               </div>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Search by Name or House No.</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Search by Name or Jamat No.</label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"><Search className="h-5 w-5 text-gray-400" /></div>
                 <input type="text" placeholder="Search..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="input-field pl-10" />
@@ -307,7 +307,7 @@ const mosqueAdminCollectionsPage: React.FC = () => {
                 <tr>
                   <th className="th">Date</th>
                   <th className="th">Head of House</th>
-                  <th className="th">House No.</th>
+                  <th className="th">Jamat No.</th>
                   <th className="th">Amount</th>
                   <th className="th">Months</th>
                   <th className="th">Method</th>

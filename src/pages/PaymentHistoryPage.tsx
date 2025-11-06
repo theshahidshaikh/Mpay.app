@@ -59,42 +59,40 @@ const PaymentHistoryPage: React.FC = () => {
     }
   }, [user, filterYear]);
 
-  const fetchData = async () => {
-    if (!user) return;
+const fetchData = async () => {
+  if (!user) return;
 
-    setLoading(true);
-    try {
-      // Fetch household data
-      const { data: householdData, error: householdError } = await supabase
-        .from('households')
-        .select(`
-          *,
-          mosque:mosques(name)
-        `)
-        .eq('user_id', user.id)
-        .single();
+  setLoading(true);
+  try {
+    // ✅ Fetch household data (fix: simplified select string)
+    const { data: householdData, error: householdError } = await supabase
+      .from('households')
+      .select('*, mosques(name)')
+      .eq('user_id', user.id)
+      .single();
 
-      if (householdError) throw householdError;
-      setHousehold(householdData);
+    if (householdError) throw householdError;
+    setHousehold(householdData as Household);
 
-      // Fetch payment history
-      const { data: paymentsData, error: paymentsError } = await supabase
-        .from('payments')
-        .select('*')
-        .eq('household_id', householdData.id)
-        .eq('year', filterYear)
-        .eq('status', 'paid')
-        .order('payment_date', { ascending: false });
+    // ✅ Fetch payment history
+    const { data: paymentsData, error: paymentsError } = await supabase
+      .from('payments')
+      .select('*')
+      .eq('household_id', (householdData as any).id)
+      .eq('year', filterYear)
+      .eq('status', 'paid')
+      .order('payment_date', { ascending: false });
 
-      if (paymentsError) throw paymentsError;
-      setPayments(paymentsData || []);
-    } catch (error) {
-      console.error('Error fetching data:', error);
-      toast.error('Error loading payment history');
-    } finally {
-      setLoading(false);
-    }
-  };
+    if (paymentsError) throw paymentsError;
+    setPayments(paymentsData || []);
+  } catch (error) {
+    console.error('Error fetching data:', error);
+    toast.error('Error loading payment history');
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   const getFilteredPayments = () => {
     let filtered = payments;

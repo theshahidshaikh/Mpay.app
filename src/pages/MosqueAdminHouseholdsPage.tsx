@@ -174,14 +174,14 @@ const mosqueAdminHouseholdsPage: React.FC = () => {
                 </h2>
                 <div className="relative mt-4 md:mt-0">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"><Search className="h-5 w-5 text-gray-400" /></div>
-                <input type="text" placeholder="Search by name or house no..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="input-field pl-10 w-full md:w-64" />
+                <input type="text" placeholder="Search by name or Jamat No..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="input-field pl-10 w-full md:w-64" />
                 </div>
             </div>
             <div className="overflow-x-auto">
                 <table className="min-w-full divide-y divide-gray-200">
                     <thead className="bg-gray-50">
                         <tr>
-                            <th className="th text-center">House No.</th>
+                            <th className="th text-center">Jamat No.</th>
                             <th className="th text-center">Head of House</th>
                             <th className="th text-center">Members</th>
                             <th className="th text-center">Contact</th>
