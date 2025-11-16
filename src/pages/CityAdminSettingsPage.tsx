@@ -198,7 +198,7 @@ const CityAdminProfilePage: React.FC = () => {
       <Navbar />
       <main className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Profile Header */}
-        <div className="bg-white rounded-lg shadow-md p-6 mb-8 flex items-center space-x-6">
+        <div className="card bg-white rounded-lg shadow-md p-6 mb-8 flex items-center space-x-6">
           <div className="flex-shrink-0 h-20 w-20 rounded-full bg-primary-100 flex items-center justify-center">
             <User className="h-10 w-10 text-primary-600" />
           </div>
@@ -213,7 +213,7 @@ const CityAdminProfilePage: React.FC = () => {
 
         {/* Pending Change Banner */}
         {pendingChange && (
-            <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-8 rounded-r-lg">
+            <div className="card bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-8 rounded-r-lg">
                 <div className="flex">
                     <div className="flex-shrink-0">
                         <AlertCircle className="h-5 w-5 text-yellow-400" />
@@ -228,12 +228,12 @@ const CityAdminProfilePage: React.FC = () => {
         )}
 
         {/* Personal Information Card */}
-        <div className="bg-white p-6 rounded-lg shadow-md mb-8">
+        <div className="card bg-white p-6 rounded-lg shadow-md mb-8">
           <form onSubmit={handleUpdateProfile}>
             <div className="flex justify-between items-center mb-6 border-b pb-4">
               <h2 className="text-xl font-semibold text-gray-900">Personal Information</h2>
               {!isEditing && (
-                <button type="button" onClick={() => setIsEditing(true)} className="btn-secondary">
+                <button type="button" onClick={() => setIsEditing(true)} className="btn-primary">
                   <Edit className="h-4 w-4 mr-2" />
                   Edit Profile
                 </button>
@@ -292,7 +292,7 @@ const CityAdminProfilePage: React.FC = () => {
 
             {isEditing && (
               <div className="pt-6 mt-6 border-t flex justify-end space-x-3">
-                <button type="button" onClick={handleCancelEdit} className="btn-secondary">
+                <button type="button" onClick={handleCancelEdit} className="btn-primary">
                   <X className="h-5 w-5 mr-2" /> Cancel
                 </button>
                 <button type="submit" className="btn-primary" disabled={isUpdating}>
@@ -304,7 +304,7 @@ const CityAdminProfilePage: React.FC = () => {
         </div>
 
         {/* Security Card */}
-        <div className="bg-white p-6 rounded-lg shadow-md">
+        <div className="card bg-white p-6 rounded-lg shadow-md">
           <h2 className="text-xl font-semibold text-gray-900 mb-6">Account Security</h2>
           <div className="space-y-4">
             <div className="flex justify-between items-center p-4 border rounded-lg">
@@ -312,14 +312,7 @@ const CityAdminProfilePage: React.FC = () => {
                 <h3 className="font-medium text-gray-800">Password</h3>
                 <p className="text-sm text-gray-500">Change your password to keep your account secure.</p>
               </div>
-              <button onClick={() => setShowPasswordModal(true)} className="btn-secondary">Change</button>
-            </div>
-            <div className="flex justify-between items-center p-4 border rounded-lg bg-red-50 border-red-200">
-              <div>
-                <h3 className="font-medium text-red-800">Log Out</h3>
-                <p className="text-sm text-red-600">You will be returned to the login screen.</p>
-              </div>
-              <button onClick={handleLogout} className="btn-danger-outline"><LogOut className="h-4 w-4 mr-2" />Log Out</button>
+              <button onClick={() => setShowPasswordModal(true)} className="btn-primary">Change</button>
             </div>
           </div>
         </div>
@@ -327,7 +320,7 @@ const CityAdminProfilePage: React.FC = () => {
 
       {/* Password Change Modal */}
       {showPasswordModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-4 z-50">
+        <div className="card fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-lg p-6 w-full max-w-md shadow-xl">
             <h3 className="text-lg font-medium text-gray-900 mb-4">Change Password</h3>
             <form onSubmit={handlePasswordChangeSubmit} className="space-y-4">
@@ -351,7 +344,7 @@ const CityAdminProfilePage: React.FC = () => {
               </div>
               <div className="pt-4 flex justify-end items-center">
                 <div className="space-x-3">
-                    <button type="button" onClick={() => setShowPasswordModal(false)} className="btn-secondary">Cancel</button>
+                    <button type="button" onClick={() => setShowPasswordModal(false)} className="btn-primary">Cancel</button>
                     <button type="submit" className="btn-primary" disabled={isUpdating}>{isUpdating ? 'Saving...' : 'Save'}</button>
                 </div>
               </div>

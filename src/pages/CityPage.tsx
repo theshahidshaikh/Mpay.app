@@ -3,7 +3,7 @@ import { useNavigate, useParams, Link } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
-import { Building, Users, ArrowLeft, ChevronRight, IndianRupee, CheckCircle } from 'lucide-react';
+import { Building, MapPin, ChevronRight, ArrowLeft, Users, IndianRupee, CheckCircle } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 // Interfaces for the new data structure
@@ -39,6 +39,27 @@ const CityPage: React.FC = () => {
   const navigate = useNavigate();
 
   const decodedCityName = cityName ? decodeURIComponent(cityName) : '';
+
+  // 👇 START HELPER FUNCTIONS
+  const formatCompactNumber = (num: number, isCurrency: boolean): string => {
+    // Use 'en-IN' for lakh/crore notation if available, otherwise fallback to 'en-US' (K/M)
+    const locale = 'en-IN';
+
+    // Check for explicit 'en-IN' compact support, else use generic compact
+    const formatted = Intl.NumberFormat(locale, {
+      notation: "compact",
+      maximumFractionDigits: 1
+    }).format(num);
+
+    return isCurrency ? `₹${formatted}` : formatted;
+  };
+
+  const getFullNumberTitle = (num: number, isCurrency: boolean): string => {
+    const formatted = num.toLocaleString('en-IN', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+    return isCurrency ? `₹${formatted}` : formatted;
+  };
+  // 👆 END HELPER FUNCTIONS
+
 
   const fetchData = useCallback(async () => {
     if (!decodedCityName) return;
@@ -96,24 +117,40 @@ const CityPage: React.FC = () => {
 
         {/* --- Key Metric Cards for the City --- */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <div className="card text-center">
+          {/* Total Mosques */}
+          <div
+            className="card text-center overflow-hidden transition duration-300 hover:shadow-lg cursor-default"
+            title={getFullNumberTitle(totals?.total_mosques || 0, false)}
+          >
             <Building className="h-8 w-8 mx-auto text-primary-600 mb-2" />
-            <p className="text-3xl font-bold text-gray-900">{totals?.total_mosques.toLocaleString() || 0}</p>
+            <p className="text-3xl font-bold text-gray-900 truncate">{formatCompactNumber(totals?.total_mosques || 0, false)}</p>
             <p className="text-gray-500">Total mosques</p>
           </div>
-          <div className="card text-center">
+          {/* Total Households */}
+          <div
+            className="card text-center overflow-hidden transition duration-300 hover:shadow-lg cursor-default"
+            title={getFullNumberTitle(totals?.total_households || 0, false)}
+          >
             <Users className="h-8 w-8 mx-auto text-primary-600 mb-2" />
-            <p className="text-3xl font-bold text-gray-900">{totals?.total_households.toLocaleString() || 0}</p>
+            <p className="text-3xl font-bold text-gray-900 truncate">{formatCompactNumber(totals?.total_households || 0, false)}</p>
             <p className="text-gray-500">Total Households</p>
           </div>
-          <div className="card text-center">
+          {/* Total Population */}
+          <div
+            className="card text-center overflow-hidden transition duration-300 hover:shadow-lg cursor-default"
+            title={getFullNumberTitle(totals?.total_population || 0, false)}
+          >
             <Users className="h-8 w-8 mx-auto text-indigo-500 mb-2" />
-            <p className="text-3xl font-bold text-gray-900">{totals?.total_population.toLocaleString() || 0}</p>
+            <p className="text-3xl font-bold text-gray-900 truncate">{formatCompactNumber(totals?.total_population || 0, false)}</p>
             <p className="text-gray-500">Total Population</p>
           </div>
-          <div className="card text-center">
+          {/* Collection (This Year) */}
+          <div
+            className="card text-center overflow-hidden transition duration-300 hover:shadow-lg cursor-default"
+            title={getFullNumberTitle(totals?.total_collection || 0, true)}
+          >
             <IndianRupee className="h-8 w-8 mx-auto text-green-500 mb-2" />
-            <p className="text-3xl font-bold text-gray-900">₹{totals?.total_collection.toLocaleString() || 0}</p>
+            <p className="text-3xl font-bold text-gray-900 truncate">{formatCompactNumber(totals?.total_collection || 0, true)}</p>
             <p className="text-gray-500">Collection (This Year)</p>
           </div>
         </div>
@@ -138,8 +175,8 @@ const CityPage: React.FC = () => {
                   <tr key={mosque.id} onClick={() => handlemosqueClick(mosque.id)} className="hover:bg-gray-50 cursor-pointer">
                     <td className="px-6 py-4 whitespace-nowrap font-medium text-gray-900">{mosque.name}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-gray-600">{mosque.admin_full_name}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-gray-600">{mosque.households_count}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-gray-600">{mosque.population_count}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-gray-600">{mosque.households_count.toLocaleString()}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-gray-600">{mosque.population_count.toLocaleString()}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                       <ChevronRight className="h-5 w-5 text-gray-400" />
                     </td>
@@ -149,9 +186,9 @@ const CityPage: React.FC = () => {
             </table>
           </div>
           {activemosques.length === 0 && !loading && (
-             <div className="text-center py-8">
-                <Building className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                <p className="text-gray-500">No active mosques found in this city.</p>
+            <div className="text-center py-8">
+              <Building className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+              <p className="text-gray-500">No active mosques found in this city.</p>
             </div>
           )}
         </div>

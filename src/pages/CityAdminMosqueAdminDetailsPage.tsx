@@ -78,6 +78,11 @@ const CityAdminmosqueAdminDetailsPage: React.FC = () => {
     }
   };
 
+  // 👇 NEW: Handler for clicking an assigned mosque
+  const handlemosqueNavigation = (mosqueId: string) => {
+    navigate(`/mosques/${mosqueId}`);
+  };
+
   if (loading || !details) {
     return (
       <div className="bg-gray-50 min-h-screen">
@@ -98,7 +103,7 @@ const CityAdminmosqueAdminDetailsPage: React.FC = () => {
             <ArrowLeft className="h-5 w-5 mr-2" />
             Back to Admins List
           </button>
-          
+
           <div className="flex flex-col sm:flex-row justify-between items-start">
             <div>
               <h1 className="text-4xl font-extrabold tracking-tight text-gray-900">{details.full_name}</h1>
@@ -115,23 +120,23 @@ const CityAdminmosqueAdminDetailsPage: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {/* Left Column: Admin Info */}
           <div className="md:col-span-1">
-            <div className="bg-white p-6 rounded-lg shadow-md">
+            <div className="card bg-white p-6 rounded-lg shadow-md">
               <h2 className="text-xl font-semibold text-gray-900 mb-4">Contact Information</h2>
               <dl className="divide-y divide-gray-200">
                 <div className="py-3 flex items-center justify-between">
-                  <dt className="text-sm font-medium text-gray-500 flex items-center"><User className="h-5 w-5 mr-3 text-gray-400"/>Name</dt>
+                  <dt className="text-sm font-medium text-gray-500 flex items-center"><User className="h-5 w-5 mr-3 text-gray-400" />Name</dt>
                   <dd className="text-sm text-gray-900">{details.full_name}</dd>
                 </div>
                 <div className="py-3 flex items-center justify-between">
-                  <dt className="text-sm font-medium text-gray-500 flex items-center"><Mail className="h-5 w-5 mr-3 text-gray-400"/>Email</dt>
+                  <dt className="text-sm font-medium text-gray-500 flex items-center"><Mail className="h-5 w-5 mr-3 text-gray-400" />Email</dt>
                   <dd className="text-sm text-gray-900">{details.email}</dd>
                 </div>
                 <div className="py-3 flex items-center justify-between">
-                  <dt className="text-sm font-medium text-gray-500 flex items-center"><Phone className="h-5 w-5 mr-3 text-gray-400"/>Phone</dt>
+                  <dt className="text-sm font-medium text-gray-500 flex items-center"><Phone className="h-5 w-5 mr-3 text-gray-400" />Phone</dt>
                   <dd className="text-sm text-gray-900">{details.phone || 'N/A'}</dd>
                 </div>
                 <div className="py-3 flex items-center justify-between">
-                  <dt className="text-sm font-medium text-gray-500 flex items-center"><MapPin className="h-5 w-5 mr-3 text-gray-400"/>City</dt>
+                  <dt className="text-sm font-medium text-gray-500 flex items-center"><MapPin className="h-5 w-5 mr-3 text-gray-400" />City</dt>
                   <dd className="text-sm text-gray-900">{details.city}</dd>
                 </div>
               </dl>
@@ -140,14 +145,18 @@ const CityAdminmosqueAdminDetailsPage: React.FC = () => {
 
           {/* Right Column: Assigned mosques */}
           <div className="md:col-span-2">
-            <div className="bg-white p-6 rounded-lg shadow-md">
+            <div className="card bg-white p-6 rounded-lg shadow-md">
               <h2 className="text-xl font-semibold text-gray-900 mb-4">Assigned mosque(s)</h2>
               {mosques.length > 0 ? (
                 <ul className="divide-y divide-gray-200">
                   {mosques.map(mosque => (
-                    <li key={mosque.id} className="py-4 flex items-center justify-between hover:bg-gray-100 rounded-md px-2 -mx-2 transition-colors">
+                    <li
+                      key={mosque.id}
+                      onClick={() => handlemosqueNavigation(mosque.id)}
+                      className="py-4 flex items-center justify-between hover:bg-gray-100 rounded-md px-2 -mx-2 transition-colors cursor-pointer" // ADDED: cursor-pointer
+                    >
                       <div className="flex items-center">
-                        <Building className="h-6 w-6 mr-4 text-primary-600"/>
+                        <Building className="h-6 w-6 mr-4 text-primary-600" />
                         <span className="text-gray-800 font-medium">{mosque.name}</span>
                       </div>
                       <ChevronRight className="h-5 w-5 text-gray-400" />
@@ -186,7 +195,7 @@ const CityAdminmosqueAdminDetailsPage: React.FC = () => {
             <div className="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse">
               <button
                 type="button"
-                className="btn-danger w-full sm:ml-3 sm:w-auto"
+                className="btn-Denger ml-4"
                 onClick={confirmDelete}
                 disabled={isDeleting}
               >
@@ -194,7 +203,7 @@ const CityAdminmosqueAdminDetailsPage: React.FC = () => {
               </button>
               <button
                 type="button"
-                className="btn-secondary mt-3 w-full sm:mt-0 sm:w-auto"
+                className="btn-secondary mt-3 w-full sm:mt-0 sm:w-auto" // ADDED: Ensuring btn-secondary is correctly styled
                 onClick={() => setShowDeleteModal(false)}
               >
                 Cancel
@@ -207,4 +216,4 @@ const CityAdminmosqueAdminDetailsPage: React.FC = () => {
   );
 };
 
-export default CityAdminmosqueAdminDetailsPage; 
+export default CityAdminmosqueAdminDetailsPage;

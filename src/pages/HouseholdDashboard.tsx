@@ -131,7 +131,7 @@ const HouseholdDashboard: React.FC = () => {
   
   // Updated Summary Calculations
   const paidMonthsForYear = payments.filter(p => p.status === 'paid');
-  const pendingMonthsForYear = payments.filter(p => p.status === 'pending_verification');
+  const pendingMonthsForYear = payments.filter(p => p.status === 'pending');
   
   const totalPaidForYear = paidMonthsForYear.reduce((sum, p) => sum + p.amount, 0);
   const totalPendingForYear = pendingMonthsForYear.reduce((sum, p) => sum + p.amount, 0);
@@ -156,7 +156,7 @@ const HouseholdDashboard: React.FC = () => {
     <div className="bg-gray-50 min-h-screen pb-10">
       <Navbar />
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="mb-8">
+        <div className="card mb-8 bg-white p-6 rounded-lg shadow-md">
           <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
           <p className="text-gray-600 mt-1">Assalam wailaikum, {household?.head_of_house || user?.email}</p>
         </div>
@@ -203,14 +203,14 @@ const HouseholdDashboard: React.FC = () => {
                 <div className="flex flex-wrap gap-2">
                   <button
                     onClick={() => setShowFilters(!showFilters)}
-                    className="btn-secondary flex items-center text-sm"
+                    className="btn-primary flex items-center text-sm"
                   >
                     <Filter className="h-4 w-4 mr-2" />
                     Filters
                   </button>
                   <button
                     onClick={resetFilters}
-                    className="btn-secondary flex items-center text-sm"
+                    className="btn-primary flex items-center text-sm"
                   >
                     <RotateCcw className="h-4 w-4 mr-2" />
                     Reset
@@ -300,7 +300,7 @@ const HouseholdDashboard: React.FC = () => {
                   </button>
                 </Link>
                 <Link to="/household/history" className="w-full sm:w-auto">
-                  <button className="btn-secondary flex items-center justify-center w-full">
+                  <button className="btn-primary flex items-center justify-center w-full">
                     View Payment History
                   </button>
                 </Link>

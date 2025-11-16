@@ -5,7 +5,7 @@ import { supabase } from '../lib/supabase';
 import { 
   CreditCard, 
   Calendar, 
-  DollarSign, 
+  IndianRupee, 
   CheckCircle, 
   XCircle,
   AlertCircle,
@@ -259,7 +259,7 @@ const submitForVerification = async () => {
     <div>
       <Navbar />
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-20">
-        <div className="mb-8">
+        <div className="card mb-8 bg-white p-6 rounded-lg shadow-md">
           <button
             onClick={() => navigate('/household/dashboard')}
             className="hidden md:flex items-center text-primary-600 hover:text-primary-700 mb-4"
@@ -360,16 +360,18 @@ const submitForVerification = async () => {
               {paymentStep === 1 && (
                 <div>
                   <h3 className="text-lg font-semibold text-gray-900 mb-4">Step 1: Make UPI Payment</h3>
-                  <div className="bg-gray-50 rounded-lg p-4 mb-6 text-center">
-                    <p className="text-sm text-gray-600">Pay the total amount to the mosque's UPI ID.</p>
-                    <p className="font-bold text-primary-600 text-lg my-2">{upiId}</p>
-                    <p className="font-bold text-2xl">₹{totalAmount.toLocaleString()}</p>
+                  <div className="bg-red-50 rounded-lg p-4 mb-10 text">
+                    <p className="text-sm text-black-600">1.Pay the total amount to the Masjid's UPI ID.</p>
+                    <p className="text-sm text-black-600">2.Take Screenshot after payment</p>
+                    <p className="text-sm text-black-600">3.Comeback after payment to upload Screenshot</p>
+                    <p className="font-bold text-primary-600 text-lg my-2 text-center">{upiId}</p>
+                    <p className="font-bold text-2xl text-center">₹{totalAmount.toLocaleString()}</p>
                     <a href={upiLink} className="btn-primary w-full mt-4" target="_blank" rel="noopener noreferrer">
                       Pay using UPI App
                     </a>
                   </div>
                   <div className="flex justify-between items-center">
-                    <button onClick={() => { setShowPaymentForm(false); setPaymentStep(1); }} className="btn-secondary">Cancel</button>
+                    <button onClick={() => { setShowPaymentForm(false); setPaymentStep(1); }} className="btn-primary">Cancel</button>
                     <button onClick={() => setPaymentStep(2)} className="btn-primary">I have paid, Next Step</button>
                   </div>
                 </div>
@@ -396,7 +398,7 @@ const submitForVerification = async () => {
                     </div>
                   </div>
                   <div className="flex justify-between items-center">
-                    <button onClick={() => setPaymentStep(1)} className="btn-secondary">Back</button>
+                    <button onClick={() => setPaymentStep(1)} className="btn-primary">Back</button>
                     <button onClick={submitForVerification} className="btn-primary" disabled={!screenshotFile || processing}>
                       {processing ? 'Submitting...' : 'Submit for Verification'}
                     </button>

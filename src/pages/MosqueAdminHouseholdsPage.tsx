@@ -135,7 +135,7 @@ const mosqueAdminHouseholdsPage: React.FC = () => {
       <Navbar />
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {mosqueDetails && (
-            <header className="bg-white p-6 rounded-lg shadow-md mb-8">
+            <header className="card bg-white p-6 rounded-lg shadow-md mb-8">
                 <h1 className="text-3xl font-bold tracking-tight text-gray-900">{mosqueDetails.name}</h1>
                 <p className="text-lg text-gray-600 mt-1 flex items-center">
                     <MapPin className="h-5 w-5 mr-2"/> {mosqueDetails.address}, {mosqueDetails.city}, {mosqueDetails.state}
@@ -144,7 +144,7 @@ const mosqueAdminHouseholdsPage: React.FC = () => {
         )}
         
         {pendingHouseholds.length > 0 && (
-          <section className="bg-white p-6 rounded-lg shadow-md mb-8">
+          <section className="card bg-white p-6 rounded-lg shadow-md mb-8">
             <h2 className="text-xl font-semibold text-gray-900 mb-6">Pending Household Approvals</h2>
             <div className="space-y-4">
               {pendingHouseholds.map((household) => (
@@ -167,7 +167,7 @@ const mosqueAdminHouseholdsPage: React.FC = () => {
           </section>
         )}
 
-        <div className="bg-white p-6 rounded-lg shadow-md">
+        <div className="card bg-white p-6 rounded-lg shadow-md">
             <div className="flex flex-col md:flex-row justify-between md:items-center mb-6">
                 <h2 className="text-xl font-semibold text-gray-900 flex items-center">
                 <Home className="h-6 w-6 mr-3 text-primary-600"/> Active Households
@@ -234,7 +234,7 @@ const mosqueAdminHouseholdsPage: React.FC = () => {
                         Delete Household
                     </button>
                     <div className="space-x-3">
-                        <button type="button" onClick={() => setEditingHousehold(null)} className="btn-secondary">Cancel</button>
+                        <button type="button" onClick={() => setEditingHousehold(null)} className="btn-primary">Cancel</button>
                         <button type="submit" className="btn-primary">Save Changes</button>
                     </div>
                 </div>
@@ -258,7 +258,7 @@ const mosqueAdminHouseholdsPage: React.FC = () => {
             </div>
             <div className="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse">
               <button type="button" onClick={handleConfirmDelete} className="btn-danger w-full sm:ml-3 sm:w-auto">Delete</button>
-              <button type="button" onClick={() => setDeletingHousehold(null)} className="btn-secondary mt-3 w-full sm:mt-0 sm:w-auto">Cancel</button>
+              <button type="button" onClick={() => setDeletingHousehold(null)} className="btn-primary mt-3 w-full sm:mt-0 sm:w-auto">Cancel</button>
             </div>
           </div>
         </div>

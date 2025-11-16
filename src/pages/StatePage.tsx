@@ -51,6 +51,26 @@ const StatePage: React.FC = () => {
 
   const decodedStateName = stateName ? decodeURIComponent(stateName) : '';
 
+  // 👇 START HELPER FUNCTIONS
+  const formatCompactNumber = (num: number, isCurrency: boolean): string => {
+    // Use 'en-IN' for lakh/crore notation if available, otherwise fallback to 'en-US' (K/M)
+    const locale = 'en-IN';
+
+    // Check for explicit 'en-IN' compact support, else use generic compact
+    const formatted = Intl.NumberFormat(locale, {
+      notation: "compact",
+      maximumFractionDigits: 1
+    }).format(num);
+
+    return isCurrency ? `₹${formatted}` : formatted;
+  };
+
+  const getFullNumberTitle = (num: number, isCurrency: boolean): string => {
+    const formatted = num.toLocaleString('en-IN', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+    return isCurrency ? `₹${formatted}` : formatted;
+  };
+  // 👆 END HELPER FUNCTIONS
+
   const fetchData = useCallback(async () => {
     if (!decodedStateName) return;
     setLoading(true);
@@ -135,28 +155,44 @@ const StatePage: React.FC = () => {
 
         {/* --- Key Metric Cards for the State --- */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <div className="card text-center">
+          {/* Total Mosques */}
+          <div
+            className="card text-center overflow-hidden transition duration-300 hover:shadow-lg cursor-default"
+            title={getFullNumberTitle(totals?.total_mosques || 0, false)}
+          >
             <Building className="h-8 w-8 mx-auto text-primary-600 mb-2" />
-            <p className="text-3xl font-bold text-gray-900">{totals?.total_mosques.toLocaleString() || 0}</p>
+            <p className="text-3xl font-bold text-gray-900 truncate">{formatCompactNumber(totals?.total_mosques || 0, false)}</p>
             <p className="text-gray-500">Total mosques</p>
           </div>
-          <div className="card text-center">
+          {/* Total Households */}
+          <div
+            className="card text-center overflow-hidden transition duration-300 hover:shadow-lg cursor-default"
+            title={getFullNumberTitle(totals?.total_households || 0, false)}
+          >
             <Users className="h-8 w-8 mx-auto text-primary-600 mb-2" />
-            <p className="text-3xl font-bold text-gray-900">{totals?.total_households.toLocaleString() || 0}</p>
+            <p className="text-3xl font-bold text-gray-900 truncate">{formatCompactNumber(totals?.total_households || 0, false)}</p>
             <p className="text-gray-500">Total Households</p>
           </div>
-          <div className="card text-center">
+          {/* Total Population */}
+          <div
+            className="card text-center overflow-hidden transition duration-300 hover:shadow-lg cursor-default"
+            title={getFullNumberTitle(totals?.total_population || 0, false)}
+          >
             <Users className="h-8 w-8 mx-auto text-indigo-500 mb-2" />
-            <p className="text-3xl font-bold text-gray-900">{totals?.total_population.toLocaleString() || 0}</p>
+            <p className="text-3xl font-bold text-gray-900 truncate">{formatCompactNumber(totals?.total_population || 0, false)}</p>
             <p className="text-gray-500">Total Population</p>
           </div>
-          <div className="card text-center">
+          {/* Collection (This Year) */}
+          <div
+            className="card text-center overflow-hidden transition duration-300 hover:shadow-lg cursor-default"
+            title={getFullNumberTitle(totals?.total_collection || 0, true)}
+          >
             <IndianRupee className="h-8 w-8 mx-auto text-green-500 mb-2" />
-            <p className="text-3xl font-bold text-gray-900">₹{totals?.total_collection.toLocaleString() || 0}</p>
+            <p className="text-3xl font-bold text-gray-900 truncate">{formatCompactNumber(totals?.total_collection || 0, true)}</p>
             <p className="text-gray-500">Collection (This Year)</p>
           </div>
         </div>
-        
+
         {/* --- Table View of Cities --- */}
         <div className="card mb-8">
           <h2 className="text-xl font-semibold text-gray-900 mb-6 flex items-center">
@@ -178,9 +214,9 @@ const StatePage: React.FC = () => {
                 {statsByCity.map((stat) => (
                   <tr key={stat.city} onClick={() => handleCityClick(stat.city)} className="hover:bg-gray-50 cursor-pointer">
                     <td className="px-6 py-4 whitespace-nowrap font-medium text-gray-900">{stat.city}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-gray-600 text-center">{stat.mosque_count}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-gray-600 text-center">{stat.household_count}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-gray-600 text-center">{stat.population}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-gray-600 text-center">{stat.mosque_count.toLocaleString()}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-gray-600 text-center">{stat.household_count.toLocaleString()}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-gray-600 text-center">{stat.population.toLocaleString()}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                       <ChevronRight className="h-5 w-5 text-gray-400" />
                     </td>
@@ -189,10 +225,10 @@ const StatePage: React.FC = () => {
               </tbody>
             </table>
           </div>
-           {statsByCity.length === 0 && !loading && (
-             <div className="text-center py-8">
-                <MapPin className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                <p className="text-gray-500">No active cities found in this state.</p>
+          {statsByCity.length === 0 && !loading && (
+            <div className="text-center py-8">
+              <MapPin className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+              <p className="text-gray-500">No active cities found in this state.</p>
             </div>
           )}
         </div>

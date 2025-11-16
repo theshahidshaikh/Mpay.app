@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { 
   Building, 
   Users, 
-  DollarSign, 
+  IndianRupee, 
   Shield, 
   CheckCircle, 
   BarChart3, 

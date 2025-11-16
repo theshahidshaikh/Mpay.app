@@ -114,12 +114,12 @@ const AdminDetailsModal: React.FC<AdminDetailsModalProps> = ({ isOpen, onClose, 
         <div className="mt-8 flex justify-end space-x-3 border-t pt-6">
           {isEditing ? (
             <>
-              <button onClick={() => setIsEditing(false)} className="btn-secondary"><XCircle className="mr-2 h-4 w-4" />Cancel</button>
+              <button onClick={() => setIsEditing(false)} className="btn-primary"><XCircle className="mr-2 h-4 w-4" />Cancel</button>
               <button onClick={handleSave} className="btn-primary"><Save className="mr-2 h-4 w-4" />Save</button>
             </>
           ) : (
             <>
-              <button onClick={() => setIsEditing(true)} className="btn-secondary"><Edit className="mr-2 h-4 w-4" />Edit</button>
+              <button onClick={() => setIsEditing(true)} className="btn-primary"><Edit className="mr-2 h-4 w-4" />Edit</button>
               <button onClick={handleDelete} className="btn-danger"><Trash2 className="mr-2 h-4 w-4" />Delete</button>
             </>
           )}

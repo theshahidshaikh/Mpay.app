@@ -97,7 +97,7 @@ const CityAdminAdminsPage: React.FC = () => {
 
         {/* --- Pending Approvals Section --- */}
         {pendingAdmins.length > 0 && (
-          <section className="bg-white p-6 rounded-lg shadow-md mb-8">
+          <section className="card bg-white p-6 rounded-lg shadow-md mb-8">
             <h2 className="text-xl font-semibold text-gray-900 mb-6 flex items-center">
               <Clock className="h-6 w-6 mr-3 text-amber-500" /> Pending Approvals
             </h2>
@@ -120,7 +120,7 @@ const CityAdminAdminsPage: React.FC = () => {
         )}
 
         {/* --- Active Admins Table Section --- */}
-        <section className="bg-white p-6 rounded-lg shadow-md">
+        <section className="card bg-white p-6 rounded-lg shadow-md">
           <h2 className="text-xl font-semibold text-gray-900 mb-6 flex items-center">
             <User className="h-6 w-6 mr-3 text-primary-600" />Active mosque Admins
           </h2>

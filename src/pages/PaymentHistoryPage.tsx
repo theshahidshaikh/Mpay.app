@@ -5,13 +5,13 @@ import { supabase } from '../lib/supabase';
 import {
   History,
   Calendar,
-  DollarSign,
+  IndianRupee,
   CreditCard,
   Download,
   Filter,
   ArrowLeft,
   CheckCircle,
-  Receipt
+  Receipt,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
@@ -153,7 +153,7 @@ const fetchData = async () => {
       case 'netbanking':
         return <CreditCard className="h-4 w-4" />;
       case 'cash':
-        return <DollarSign className="h-4 w-4" />;
+        return <IndianRupee className="h-4 w-4" />;
       default:
         return <CreditCard className="h-4 w-4" />;
     }
@@ -194,7 +194,7 @@ const fetchData = async () => {
     <div>
       <Navbar />
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-10 pt-4 pb-20">
-        <div className="mb-8">
+        <div className="card mb-8 bg-white p-6 rounded-lg shadow-md">
           <button
             onClick={() => navigate('/household/dashboard')}
             className="hidden md:flex items-center text-primary-600 hover:text-primary-700 mb-4"
@@ -230,7 +230,7 @@ const fetchData = async () => {
             <div className="card">
               <div className="flex flex-col items-center text-center md:flex-row md:text-left">
                 <div className="p-3 rounded-full bg-primary-100">
-                  <DollarSign className="h-6 w-6 text-primary-600" />
+                  <IndianRupee className="h-6 w-6 text-primary-600" />
                 </div>
                 <div className="mt-4 md:mt-0 md:ml-4">
                   <h3 className="text-lg font-semibold text-gray-900">₹{totalPaid.toLocaleString()}</h3>
@@ -258,7 +258,7 @@ const fetchData = async () => {
                 </div>
                 <div className="mt-4 md:mt-0 md:ml-4">
                   <h3 className="text-lg font-semibold text-gray-900">{household.house_number}</h3>
-                  <p className="text-sm text-gray-600">House Number</p>
+                  <p className="text-sm text-gray-600">Jamaat Number</p>
                 </div>
               </div>
             </div>

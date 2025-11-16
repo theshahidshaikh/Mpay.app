@@ -37,7 +37,7 @@ const AwaitingApprovalPage: React.FC = () => {
         <div className="mt-8">
           <button 
             onClick={handleLogout} 
-            className="btn-secondary w-full flex items-center justify-center"
+            className="btn-primary w-full flex items-center justify-center"
           >
             <LogOut className="h-5 w-5 mr-2" />
             Log Out

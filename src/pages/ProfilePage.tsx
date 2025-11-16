@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Navbar from '../components/Navbar';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
-import { User, Phone, Mail, Home, Users, Building, Edit, Save, X, KeyRound, LogOut } from 'lucide-react';
+import { User, Phone, Mail, Home, Users, Building, Edit, Save, X, KeyRound, LogOut, IndianRupee } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 
@@ -35,9 +35,17 @@ const ProfilePage: React.FC = () => {
     female_count: 0,
     contact_number: '',
     house_number: '',
+    monthly_amount: 0, // MODIFIED to monthly_amount in state
   });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  
+  // 👇 NEW PASSWORD STATE
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
+  const [currentPassword, setCurrentPassword] = useState(''); // ADDED: Current password state
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmNewPassword, setConfirmNewPassword] = useState('');
+  // 👆 END NEW PASSWORD STATE
 
   useEffect(() => {
     if (user) {
@@ -55,6 +63,7 @@ const ProfilePage: React.FC = () => {
         female_count: household.female_count,
         contact_number: household.contact_number,
         house_number: household.house_number,
+        monthly_amount: household.annual_amount / 12, // Calculate monthly from annual
       });
       setLoading(false);
     } else if (user && !household) {
@@ -91,6 +100,9 @@ const ProfilePage: React.FC = () => {
       toast.error('Total members count should equal male + female count');
       return;
     }
+    
+    // CALCULATE annual_amount before saving
+    const calculatedAnnualAmount = editData.monthly_amount * 12;
 
     setSaving(true);
     try {
@@ -103,6 +115,7 @@ const ProfilePage: React.FC = () => {
           female_count: editData.female_count,
           contact_number: editData.contact_number,
           house_number: editData.house_number,
+          annual_amount: calculatedAnnualAmount, // SAVE calculated annual amount
           updated_at: new Date().toISOString(),
         })
         .eq('id', household.id);
@@ -141,6 +154,7 @@ const ProfilePage: React.FC = () => {
         female_count: household.female_count,
         contact_number: household.contact_number,
         house_number: household.house_number,
+        monthly_amount: household.annual_amount / 12, // Revert to initial state
       });
     }
     setIsEditing(false);
@@ -169,9 +183,52 @@ const ProfilePage: React.FC = () => {
   };
   
   const handleLogout = async () => {
-    await signOut();
-    navigate('/');
+    const toastId = toast.loading('Logging out...');
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      toast.error(error.message, { id: toastId });
+    } else {
+      toast.success('Logged out successfully', { id: toastId });
+      navigate('/login');
+    }
   };
+
+  // 👇 PASSWORD HANDLER
+  const handlePasswordChangeSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    // IMPORTANT: Current password check is usually done via a backend RPC or Edge Function 
+    // by re-authenticating the user. For a quick front-end integration, we only check 
+    // new password match and length, and rely on the Supabase token validity.
+    
+    if (newPassword !== confirmNewPassword) return toast.error('New passwords do not match.');
+    if (newPassword.length < 6) return toast.error('Password must be at least 6 characters.');
+    
+    // NOTE: If you need to verify the `currentPassword`, you would call a custom 
+    // Supabase RPC function here that checks the credentials server-side.
+    
+    setSaving(true);
+    const toastId = toast.loading('Changing password...');
+    
+    const { error } = await supabase.auth.updateUser({ password: newPassword });
+    
+    setSaving(false);
+    if (error) {
+        toast.error(error.message || 'Failed to change password.', { id: toastId });
+    } else {
+        toast.success('Password changed successfully! Please log in again.', { id: toastId });
+        
+        // Clear state and close modal
+        setCurrentPassword('');
+        setNewPassword('');
+        setConfirmNewPassword('');
+        setShowPasswordModal(false);
+        // FORCE LOGOUT to ensure new JWT is acquired with new auth state
+        await supabase.auth.signOut();
+        navigate('/login');
+    }
+  };
+  // 👆 END PASSWORD HANDLER
 
   if (loading) {
     return (
@@ -201,7 +258,7 @@ const ProfilePage: React.FC = () => {
   return (
     <div className="bg-gray-50 min-h-screen pb-10">
       <Navbar />
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-16">
         <div className="mb-8 flex justify-between items-center">
           <div>
             <h1 className="text-3xl font-bold text-gray-900">Profile</h1>
@@ -214,7 +271,7 @@ const ProfilePage: React.FC = () => {
             </button>
           ) : (
             <div className="flex space-x-3">
-              <button onClick={handleCancel} className="btn-secondary flex items-center" disabled={saving}>
+              <button onClick={handleCancel} className="btn-primary flex items-center" disabled={saving}>
                 <X className="h-4 w-4 mr-2" /> Cancel
               </button>
               <button onClick={handleSave} className="btn-primary flex items-center" disabled={saving}>
@@ -298,6 +355,36 @@ const ProfilePage: React.FC = () => {
               </div>
             </div>
 
+            {/* Monthly/Annual Amount Block */}
+            <div className="grid grid-cols-2 gap-4">
+                <div>
+                    <label className="block text-sm font-medium text-gray-600 mb-1">Monthly Payment Amount</label>
+                    {isEditing ? (
+                        <div className="relative">
+                            <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500">₹</span>
+                            <input
+                                type="number"
+                                value={editData.monthly_amount === 0 ? '' : editData.monthly_amount}
+                                onChange={(e) => setEditData({ ...editData, monthly_amount: parseInt(e.target.value) || 0 })}
+                                className="input-field pl-7"
+                                step="1"
+                                min="0"
+                            />
+                        </div>
+                    ) : (
+                        <p className="text-lg font-semibold text-primary-600 flex items-center">
+                            ₹{(household.annual_amount / 12).toFixed(0)}
+                        </p>
+                    )}
+                </div>
+                <div>
+                    <label className="block text-sm font-medium text-gray-600 mb-1">Calculated Annual Amount</label>
+                    <p className="text-lg font-semibold text-gray-900 flex items-center">
+                        ₹{(editData.monthly_amount * 12).toLocaleString('en-IN', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
+                    </p>
+                </div>
+            </div>
+
             <div>
               <label className="block text-sm font-medium text-gray-600 mb-1">Contact Number</label>
               {isEditing ? (
@@ -341,6 +428,7 @@ const ProfilePage: React.FC = () => {
           <h2 className="text-xl font-semibold text-gray-900 mb-6 flex items-center">
             <Home className="h-6 w-6 mr-2 text-primary-600" />
             Household Information
+          
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
@@ -353,6 +441,18 @@ const ProfilePage: React.FC = () => {
             </div>
           </div>
         </div>
+        
+        {/* 👇 NEW: Security Section with card class */}
+        <div className="card mt-8">
+          <h2 className="text-xl font-semibold text-gray-900 mb-6 flex items-center"><KeyRound className="h-6 w-6 mr-2 text-primary-600"/> Security & Actions</h2>
+          <div className="space-y-4">
+            <div className="flex justify-between items-center p-4 border rounded-lg">
+              <div><h3 className="font-medium text-gray-800">Password</h3><p className="text-sm text-gray-500">Change your password to keep your account secure.</p></div>
+              <button onClick={() => setShowPasswordModal(true)} className="btn-primary">Change</button>
+            </div>
+          </div>
+        </div>
+        {/* 👆 END NEW: Security Section */}
 
         {/* Log Out Button */}
         <div className="mt-8 flex justify-end">
@@ -363,7 +463,62 @@ const ProfilePage: React.FC = () => {
             <LogOut className="h-4 w-4 mr-2" /> Log Out
           </button>
         </div>
-      </div>
+      </main>
+      
+      {/* 👇 NEW: Change Password Modal */}
+      {showPasswordModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-lg p-6 w-full max-w-md shadow-xl">
+            <h3 className="text-lg font-medium text-gray-900 mb-4">Change Password</h3>
+            <form onSubmit={handlePasswordChangeSubmit} className="space-y-4">
+              
+{/*               Current Password Input (for verification) */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Current Password</label>
+                <input
+                  type="password"
+                  value={currentPassword}
+                  onChange={(e) => setCurrentPassword(e.target.value)}
+                  className="input-field mt-1"
+                  required
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700">New Password</label>
+                <input
+                  type="password"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  className="input-field mt-1"
+                  placeholder="At least 6 characters"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Confirm New Password</label>
+                <input
+                  type="password"
+                  value={confirmNewPassword}
+                  onChange={(e) => setConfirmNewPassword(e.target.value)}
+                  className="input-field mt-1"
+                  required
+                />
+              </div>
+              <div className="pt-4 flex justify-end items-center">
+                <div className="space-x-3">
+                    <button type="button" onClick={() => setShowPasswordModal(false)} className="btn-primary">
+                        Cancel
+                    </button>
+                    <button type="submit" className="btn-primary" disabled={saving}>
+                        {saving ? 'Saving...' : 'Save'}
+                    </button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

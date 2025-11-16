@@ -127,7 +127,7 @@ const CityAdminsPage: React.FC = () => {
             <p className="text-lg text-gray-600 mt-1">Approve new registrations and manage existing city admins.</p>
           </div>
           <Link to="/super/requests" className="mt-4 sm:mt-0 w-full sm:w-auto">
-            <button className="btn-secondary w-full">
+            <button className="btn-primary w-full">
               <FileClock className="h-5 w-5 mr-2" />
               View Change Requests
             </button>
@@ -135,7 +135,7 @@ const CityAdminsPage: React.FC = () => {
         </div>
 
         {/* Filter Section (Value is now cityFilter, which updates instantly) */}
-        <div className="bg-white p-6 rounded-lg shadow-md mb-8">
+        <div className="card bg-white p-6 rounded-lg shadow-md mb-8">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Filter by State</label>
@@ -160,7 +160,7 @@ const CityAdminsPage: React.FC = () => {
         <div className={`space-y-8 transition-opacity ${loading ? 'opacity-50' : 'opacity-100'}`}>
           {/* Pending Approvals Section */}
           {pendingAdmins.length > 0 && (
-            <div className="bg-white p-6 rounded-lg shadow-md">
+            <div className="card bg-white p-6 rounded-lg shadow-md">
               <h2 className="text-xl font-semibold text-gray-900 mb-6">Pending Approvals</h2>
               <div className="space-y-4">
                 {pendingAdmins.map((admin) => (
@@ -180,7 +180,7 @@ const CityAdminsPage: React.FC = () => {
           )}
 
 {/* Active Admins Table */}
-          <div className="bg-white p-6 rounded-lg shadow-md">
+          <div className="card bg-white p-6 rounded-lg shadow-md">
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-xl font-semibold text-gray-900 flex items-center">
                 <UserCog className="h-6 w-6 mr-3 text-primary-600" />
